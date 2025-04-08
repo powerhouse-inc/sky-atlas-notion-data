@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Master Status",
+    "id": "pxk%3C",
+    "type": "relation"
+  },
+  {
+    "name": "P0 🅗🅤🅑",
+    "id": "%60u%60P",
+    "type": "relation"
+  },
+  {
+    "name": "Doc No (or Temp Name)",
+    "id": "title",
+    "type": "title"
+  },
+  {
+    "name": "Name",
+    "id": "U%3CyQ",
+    "type": "rich_text"
+  },
+  {
+    "name": "Additional Guidance",
+    "id": "AVs~",
+    "type": "rich_text"
+  },
+  {
+    "name": "Description",
+    "id": "gON%7D",
+    "type": "rich_text"
+  },
+  {
+    "name": "Scenario Variations",
+    "id": "%40%3Du%40",
+    "type": "relation"
+  },
+  {
+    "name": "Needed Research",
+    "id": "xAtq",
+    "type": "relation"
+  },
+  {
+    "name": "Original Context Data",
+    "id": "%7CTk%5D",
+    "type": "relation"
+  },
+  {
+    "name": "Finding",
+    "id": "~%5E%7CE",
+    "type": "rich_text"
+  }
+]

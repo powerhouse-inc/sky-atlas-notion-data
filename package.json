@@ -1,0 +1,42 @@
+{
+  "name": "@powerhousedao/sky-atlas-notion-data",
+  "description": "Fetches and processes Sky Atlas data from Notion",
+  "version": "1.0.0",
+  "author": "Powerhouse DAO",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "make-tree": "./dist/scripts/make-tree.js"
+  },
+  "scripts": {
+    "make-tree": "bun run ./scripts/make-tree.ts",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "build": "tsc",
+    "prepublishOnly": "bun run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@types/bun": "latest",
+    "eslint": "^9.23.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.28.0"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.3.0",
+    "@types/diff": "^7.0.2",
+    "change-case": "^5.4.4",
+    "diff": "^7.0.0",
+    "dotenv": "^16.4.7",
+    "dotenv-expand": "^12.0.1",
+    "octokit": "^4.1.2",
+    "zod": "^3.23.8"
+  }
+}

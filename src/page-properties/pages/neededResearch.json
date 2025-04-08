@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Master Status",
+    "id": "GAsU",
+    "type": "relation"
+  },
+  {
+    "name": "P0 🅗🅤🅑",
+    "id": "KxKJ",
+    "type": "relation"
+  },
+  {
+    "name": "Name",
+    "id": "ky%3EP",
+    "type": "rich_text"
+  },
+  {
+    "name": "Content",
+    "id": "%7D%7C%3FT",
+    "type": "rich_text"
+  },
+  {
+    "name": "Doc No",
+    "id": "title",
+    "type": "title"
+  }
+]

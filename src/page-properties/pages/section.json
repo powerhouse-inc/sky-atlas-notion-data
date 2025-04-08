@@ -1,0 +1,112 @@
+[
+  {
+    "name": "Files & media",
+    "id": "XNhl",
+    "type": "files"
+  },
+  {
+    "name": "Master Status",
+    "id": "KYEh",
+    "type": "relation"
+  },
+  {
+    "name": "P0 🅗🅤🅑",
+    "id": "zYtu",
+    "type": "relation"
+  },
+  {
+    "name": "Doc No (or Temp Name)",
+    "id": "title",
+    "type": "title"
+  },
+  {
+    "name": "Name",
+    "id": "%3A%7Bvo",
+    "type": "rich_text"
+  },
+  {
+    "name": "Additional Logic",
+    "id": "jEm_",
+    "type": "rich_text"
+  },
+  {
+    "name": "Type",
+    "id": "sqZy",
+    "type": "select"
+  },
+  {
+    "name": "Type Category",
+    "id": "%3F%3Euz",
+    "type": "select"
+  },
+  {
+    "name": "Tenets",
+    "id": "R_sv",
+    "type": "relation"
+  },
+  {
+    "name": "Subdocs",
+    "id": "OH%3Co",
+    "type": "relation"
+  },
+  {
+    "name": "Annotations",
+    "id": "pnLz",
+    "type": "relation"
+  },
+  {
+    "name": "Content",
+    "id": "Z%5Elb",
+    "type": "rich_text"
+  },
+  {
+    "name": "Doc Identifier Rules",
+    "id": "g%5E%5C_",
+    "type": "rich_text"
+  },
+  {
+    "name": "Type Name",
+    "id": "jyB%40",
+    "type": "rich_text"
+  },
+  {
+    "name": "Type Overview",
+    "id": "mw%3BS",
+    "type": "rich_text"
+  },
+  {
+    "name": "Components",
+    "id": "t%3B%5CG",
+    "type": "rich_text"
+  },
+  {
+    "name": "Active Data",
+    "id": "_lCa",
+    "type": "relation"
+  },
+  {
+    "name": "Needed Research",
+    "id": "Cr%7Dc",
+    "type": "relation"
+  },
+  {
+    "name": "Original Context Data",
+    "id": "y%5CCT",
+    "type": "relation"
+  },
+  {
+    "name": "No.",
+    "id": "KaP%7B",
+    "type": "number"
+  },
+  {
+    "name": "Parent Doc",
+    "id": "ImZm",
+    "type": "relation"
+  },
+  {
+    "name": "Parent Article ",
+    "id": "xT~n",
+    "type": "relation"
+  }
+]

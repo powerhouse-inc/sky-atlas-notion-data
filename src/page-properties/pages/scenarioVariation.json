@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Master Status",
+    "id": "fMaY",
+    "type": "relation"
+  },
+  {
+    "name": "P0 🅗🅤🅑",
+    "id": "FWtp",
+    "type": "relation"
+  },
+  {
+    "name": "Finding",
+    "id": "%3Ezhd",
+    "type": "rich_text"
+  },
+  {
+    "name": "Name",
+    "id": "U%40Ju",
+    "type": "rich_text"
+  },
+  {
+    "name": "Needed Research",
+    "id": "%5Cd%7C%40",
+    "type": "relation"
+  },
+  {
+    "name": "Description",
+    "id": "%5Et%3E%3B",
+    "type": "rich_text"
+  },
+  {
+    "name": "Doc No",
+    "id": "title",
+    "type": "title"
+  },
+  {
+    "name": "Additional Guidance",
+    "id": "mHYZ",
+    "type": "rich_text"
+  }
+]

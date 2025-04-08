@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Master Status",
+    "id": "b%3Dnu",
+    "type": "relation"
+  },
+  {
+    "name": "Doc No",
+    "id": "title",
+    "type": "title"
+  },
+  {
+    "name": "Articles",
+    "id": "Mf%3BL",
+    "type": "relation"
+  },
+  {
+    "name": "Name",
+    "id": "T%7Cve",
+    "type": "rich_text"
+  },
+  {
+    "name": "Content",
+    "id": "g%7DVH",
+    "type": "rich_text"
+  },
+  {
+    "name": "Original Context Data",
+    "id": "AaCh",
+    "type": "relation"
+  },
+  {
+    "name": "Needed Research",
+    "id": "nZfF",
+    "type": "relation"
+  }
+]

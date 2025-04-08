@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Master Status",
+    "id": "YwhD",
+    "type": "relation"
+  },
+  {
+    "name": "P0 🅗🅤🅑",
+    "id": "%7CJCS",
+    "type": "relation"
+  },
+  {
+    "name": "Doc No (or Temp Name)",
+    "id": "title",
+    "type": "title"
+  },
+  {
+    "name": "Content",
+    "id": "%3DKl%60",
+    "type": "rich_text"
+  },
+  {
+    "name": "Original Context Data",
+    "id": "MjXM",
+    "type": "relation"
+  },
+  {
+    "name": "Needed Research",
+    "id": "aRFo",
+    "type": "relation"
+  },
+  {
+    "name": "Name",
+    "id": "urXT",
+    "type": "rich_text"
+  },
+  {
+    "name": "Scenarios",
+    "id": "%7B%3ALP",
+    "type": "relation"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Master Status",
+    "id": "%40t%7C%7C",
+    "type": "relation"
+  },
+  {
+    "name": "P0 🅗🅤🅑",
+    "id": "Omng",
+    "type": "relation"
+  },
+  {
+    "name": "Name",
+    "id": "e%3FQ%5B",
+    "type": "rich_text"
+  },
+  {
+    "name": "Content",
+    "id": "MRDy",
+    "type": "rich_text"
+  },
+  {
+    "name": "Doc No",
+    "id": "title",
+    "type": "title"
+  },
+  {
+    "name": "Needed Research",
+    "id": "%5EcXk",
+    "type": "relation"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Master Status",
+    "id": "fMBC",
+    "type": "relation"
+  },
+  {
+    "name": "P0 🅗🅤🅑",
+    "id": "Ocau",
+    "type": "relation"
+  },
+  {
+    "name": "Doc No",
+    "id": "title",
+    "type": "title"
+  },
+  {
+    "name": "Name",
+    "id": "ieKC",
+    "type": "rich_text"
+  },
+  {
+    "name": "Content",
+    "id": "vIeA",
+    "type": "rich_text"
+  },
+  {
+    "name": "Needed Research",
+    "id": "QfFm",
+    "type": "relation"
+  },
+  {
+    "name": "Original Context Data",
+    "id": "XDuh",
+    "type": "relation"
+  }
+]
