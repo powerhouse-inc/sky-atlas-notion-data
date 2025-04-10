@@ -21,6 +21,16 @@ import {
 } from "../constants.js";
 import { makeSchemaById } from "../utils/processing.js";
 import { RichTextAnnotations } from "./notion-data.js";
+import type { Item } from "./view-nodes.js";
+
+export const NotionUniqueId = z.object({
+  unique_id: z.object({
+    number: z.number().nullish(),
+    prefix: z.string().nullish(),
+  }),
+});
+
+export type TNotionUniqueId = z.infer<typeof NotionUniqueId>;
 
 export const NotionNumber = z.object({
   number: z.number().nullish(),
@@ -190,6 +200,8 @@ export type TProcessedArticlesById = z.infer<typeof ProcessedArticlesById>;
 export const ProcessedSection = z.object({
   number: z.number().nullish(),
   parents: ProcessedRelations,
+  isAgentArtifact: z.boolean().nullish(),
+  isSkyPrimitive: z.boolean().nullish(),
   ...SharedSchemaProperties,
 });
 
@@ -363,3 +375,4 @@ export type FetchAndProcessNotionPagesResult = {
     hub: TProcessedHubById;
   };
 };
+export type ViewNodeInputs = Record<string, Item>;

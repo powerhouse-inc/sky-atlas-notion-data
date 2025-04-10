@@ -9,42 +9,22 @@ import {
   processAtlasNotionPages,
   processNotionPage,
   processViewNodeInputs,
+  type TProcessedSectionsById,
   type TProcessedHubById,
   type TProcessedMasterStatusById,
   type ViewNodeMap,
   type ViewNodeTree,
+  handleAgents,
 } from "../src/index.js";
 import { parseArgs } from "util";
 import { Client } from "@notionhq/client";
 import fs from "fs";
-import { writeFile } from "node:fs/promises";
-import path from "path";
-import dotenv from "dotenv";
-import dotenvExpand from "dotenv-expand";
 import { mkdir } from "node:fs/promises";
 import { Octokit } from "octokit";
+import { handleEnv } from "./handleEnv.js";
+import { writeJsonToFile } from "./utils.js";
 
-// Default NODE_ENV to 'development' if not set
-process.env.NODE_ENV ||= "development";
-
-const cwd = process.cwd();
-const { NODE_ENV } = process.env;
-
-const envFiles = [
-  `.env.${NODE_ENV}.local`,
-  ...(NODE_ENV === "development" ? [`.env.local`] : []),
-  `.env.${NODE_ENV}`,
-  `.env`,
-];
-
-for (const file of envFiles) {
-  const fullPath = path.join(cwd, file);
-  if (fs.existsSync(fullPath)) {
-    const env = dotenv.config({ path: fullPath });
-    dotenvExpand.expand(env);
-  }
-}
-
+handleEnv();
 makeTree();
 
 export async function makeTree() {
@@ -97,35 +77,39 @@ export async function makeTree() {
   // Check if local data exists when useLocalData is true
   if (useLocalData) {
     const missingFiles = [];
-    
+
     // Check if directories exist
     for (const dir of directories) {
       if (!fs.existsSync(dir)) {
         missingFiles.push(`Directory: ${dir}`);
       }
     }
-    
+
     // Check if required Notion page files exist
     const requiredNotionFiles = [
       `${notionPagesOutputPath}/${MASTER_STATUS}.json`,
       `${notionPagesOutputPath}/${HUB}.json`,
     ];
-    
+
     // Add Atlas page files to required files
     for (const pageName of atlasPageNames) {
       requiredNotionFiles.push(`${notionPagesOutputPath}/${pageName}.json`);
     }
-    
+
     for (const file of requiredNotionFiles) {
       if (!fs.existsSync(file)) {
         missingFiles.push(`File: ${file}`);
       }
     }
-    
+
     if (missingFiles.length > 0) {
-      console.error("Error: --useLocalData option requires existing local data, but the following files/directories are missing:");
-      missingFiles.forEach(item => console.error(`  - ${item}`));
-      console.error("\nPlease run the script without --useLocalData first to fetch data from Notion.");
+      console.error(
+        "Error: --useLocalData option requires existing local data, but the following files/directories are missing:",
+      );
+      missingFiles.forEach((item) => console.error(`  - ${item}`));
+      console.error(
+        "\nPlease run the script without --useLocalData first to fetch data from Notion.",
+      );
       process.exit(1);
     }
   }
@@ -160,18 +144,18 @@ export async function makeTree() {
   if (!useLocalData) {
     await writeJsonToFile(
       `${notionPagesOutputPath}/${MASTER_STATUS}.json`,
-      masterStatusNotionPage
+      masterStatusNotionPage,
     );
 
     await writeJsonToFile(
       `${notionPagesOutputPath}/${HUB}.json`,
-      hubNotionPage
+      hubNotionPage,
     );
 
     for (const pageName of atlasPageNames) {
       await writeJsonToFile(
         `${notionPagesOutputPath}/${pageName}.json`,
-        fetchAtlasNotionPagesResult[pageName]
+        fetchAtlasNotionPagesResult[pageName],
       );
     }
   }
@@ -184,7 +168,7 @@ export async function makeTree() {
 
   await writeJsonToFile(
     `${processedOutputPath}/${MASTER_STATUS}.json`,
-    processedMasterStatusById
+    processedMasterStatusById,
   );
 
   const processedHubById = (await processNotionPage({
@@ -203,7 +187,7 @@ export async function makeTree() {
   for (const pageName of atlasPageNames) {
     await writeJsonToFile(
       `${processedOutputPath}/${pageName}.json`,
-      processedAtlasPagesByIdByPageName[pageName]
+      processedAtlasPagesByIdByPageName[pageName],
     );
   }
 
@@ -216,21 +200,27 @@ export async function makeTree() {
 
   await writeJsonToFile(
     `${parsedOutputPath}/${MASTER_STATUS}.json`,
-    masterStatusNameStrings
+    masterStatusNameStrings,
   );
+
+  const { section, agent } = processedAtlasPagesByIdByPageName;
+  const sectionWithAgents = handleAgents(
+    section as TProcessedSectionsById,
+    agent as TProcessedSectionsById,
+  );
+  processedAtlasPagesByIdByPageName.section = sectionWithAgents;
 
   const viewNodeInputs = await makeViewNodeInputs({
     processedAtlasPagesByIdByPageName,
     processedHubById,
     masterStatusNameStrings,
-    outputPath,
   });
 
   console.log("created view node inputs");
 
   await writeJsonToFile(
     `${parsedOutputPath}/view-node-inputs.json`,
-    viewNodeInputs
+    viewNodeInputs,
   );
 
   const {
@@ -243,7 +233,7 @@ export async function makeTree() {
 
   console.log("processed view node inputs");
   console.log(nodeCountsText);
-  
+
   await writeJsonToFile(`${outputPath}/view-node-tree.json`, viewNodeTree);
   await writeJsonToFile(`${outputPath}/view-node-map.json`, viewNodeMap);
   await writeJsonToFile(`${outputPath}/slug-lookup.json`, slugLookup);
@@ -259,7 +249,7 @@ export async function makeTree() {
 
 async function commitSnapshotToGithub(
   viewNodeTree: ViewNodeTree,
-  simplifiedViewNodeTreeTxt: string
+  simplifiedViewNodeTreeTxt: string,
 ) {
   const githubToken = process.env.GITHUB_TOKEN;
   if (!githubToken) {
@@ -269,7 +259,7 @@ async function commitSnapshotToGithub(
   const octokit = new Octokit({ auth: githubToken });
   const owner = "powerhouse-inc";
   const repo = "sky-atlas-archive";
-  
+
   try {
     const { data: refData } = await octokit.rest.git.getRef({
       owner,
@@ -277,7 +267,7 @@ async function commitSnapshotToGithub(
       ref: `heads/main`,
     });
     const latestCommitSha = refData.object.sha;
-  
+
     // Get tree SHA
     const { data: commitData } = await octokit.rest.git.getCommit({
       owner,
@@ -285,46 +275,55 @@ async function commitSnapshotToGithub(
       commit_sha: latestCommitSha,
     });
     const treeSha = commitData.tree.sha;
-  
-    const timestamp = new Date().toISOString().replace(/[:]/g, '-');
-  
+
+    const timestamp = new Date().toISOString().replace(/[:]/g, "-");
+
     // Prepare new files to commit
     const files = [
-      { path: 'atlas-tree.json', content: JSON.stringify(viewNodeTree, null, 2) },
-      { path: 'simplified-atlas-tree.txt', content: simplifiedViewNodeTreeTxt },
-      { path: `snapshots/${timestamp}.json`, content: JSON.stringify(viewNodeTree, null, 2) },
-      { path: `snapshots/${timestamp}-simplified-atlas-tree.txt`, content: simplifiedViewNodeTreeTxt },
+      {
+        path: "atlas-tree.json",
+        content: JSON.stringify(viewNodeTree, null, 2),
+      },
+      { path: "simplified-atlas-tree.txt", content: simplifiedViewNodeTreeTxt },
+      {
+        path: `snapshots/${timestamp}.json`,
+        content: JSON.stringify(viewNodeTree, null, 2),
+      },
+      {
+        path: `snapshots/${timestamp}-simplified-atlas-tree.txt`,
+        content: simplifiedViewNodeTreeTxt,
+      },
     ];
 
-   // Create a new tree from files
-  const { data: newTree } = await octokit.rest.git.createTree({
-    owner,
-    repo,
-    base_tree: treeSha,
-    tree: files.map(({ path, content }) => ({
-      path,
-      mode: '100644',
-      type: 'blob',
-      content,
-    })),
-  });
+    // Create a new tree from files
+    const { data: newTree } = await octokit.rest.git.createTree({
+      owner,
+      repo,
+      base_tree: treeSha,
+      tree: files.map(({ path, content }) => ({
+        path,
+        mode: "100644",
+        type: "blob",
+        content,
+      })),
+    });
 
-  // Create commit
-  const { data: newCommit } = await octokit.rest.git.createCommit({
-    owner,
-    repo,
-    message: `Automated commit from Vercel build (${timestamp})`,
-    tree: newTree.sha,
-    parents: [latestCommitSha],
-  });
+    // Create commit
+    const { data: newCommit } = await octokit.rest.git.createCommit({
+      owner,
+      repo,
+      message: `Automated commit from Vercel build (${timestamp})`,
+      tree: newTree.sha,
+      parents: [latestCommitSha],
+    });
 
-  // Update branch reference to point to new commit
-  await octokit.rest.git.updateRef({
-    owner,
-    repo,
-    ref: `heads/main`,
-    sha: newCommit.sha,
-  });
+    // Update branch reference to point to new commit
+    await octokit.rest.git.updateRef({
+      owner,
+      repo,
+      ref: `heads/main`,
+      sha: newCommit.sha,
+    });
 
     console.log("Successfully committed snapshot to Github");
   } catch (error) {
@@ -361,10 +360,6 @@ async function postToImportApi(viewNodeMap: ViewNodeMap) {
     console.error("Error posting to import API");
     console.error(error);
   }
-}
-
-async function writeJsonToFile(filePath: string, data: any) {
-  await writeFile(filePath, JSON.stringify(data, null, 2));
 }
 
 function displayHelp() {

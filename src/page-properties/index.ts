@@ -9,10 +9,12 @@ import scenariosProperties from "./pages/scenario.json" with { type: "json" };
 import scenarioVariationsProperties from "./pages/scenarioVariation.json" with { type: "json" };
 import scopesProperties from "./pages/scope.json" with { type: "json" };
 import sectionsProperties from "./pages/section.json" with { type: "json" };
+import agentProperties from "./pages/agent.json" with { type: "json" };
 import tenetsProperties from "./pages/tenet.json" with { type: "json" };
 import type { PagePropertiesList, PageName } from "../types/index.js";
 import {
   ACTIVE_DATA,
+  AGENT,
   ANNOTATION,
   ARTICLE,
   HUB,
@@ -39,6 +41,7 @@ export const pageProperties: Record<PageName, PagePropertiesList> = {
   [SCOPE]: scopesProperties as PagePropertiesList,
   [SECTION]: sectionsProperties as PagePropertiesList,
   [TENET]: tenetsProperties as PagePropertiesList,
+  [AGENT]: agentProperties as PagePropertiesList,
 };
 
 export const propertyIds: Record<PageName, string[]> = {
@@ -54,4 +57,5 @@ export const propertyIds: Record<PageName, string[]> = {
   [SCOPE]: scopesProperties.map((item) => item.id),
   [SECTION]: sectionsProperties.map((item) => item.id),
   [TENET]: tenetsProperties.map((item) => item.id),
+  [AGENT]: agentProperties.map((item) => item.id),
 };

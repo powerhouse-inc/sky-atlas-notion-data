@@ -136,7 +136,7 @@ export async function fetchAtlasNotionPages(args: {
   outputPath: string;
   useLocalData: boolean;
 }): Promise<FetchAtlasNotionPagesResult> {
-  const {notion, outputPath, useLocalData } = args;
+  const { notion, outputPath, useLocalData } = args;
   const atlasNotionPages = {} as FetchAtlasNotionPagesResult;
 
   for (const pageName of atlasPageNames) {

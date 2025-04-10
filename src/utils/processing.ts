@@ -13,6 +13,7 @@ import type {
   TProcessedNodeContentItem,
   TSectionDocType,
   TSupportDocType,
+  TProcessedSectionsById,
 } from "../types/index.js";
 import {
   RelationArray,
@@ -23,6 +24,7 @@ import {
   type TRichTextField,
   type TSelect,
 } from "../types/index.js";
+import { agentArtifactsSectionId } from "../constants.js";
 
 export function getTextFromTitle(titleField: TTitleField): TProcessedRichText {
   const title = titleField?.title ?? [];
@@ -346,10 +348,10 @@ export function makeViewNodeTitleSlug(node: RawViewNode) {
 export function makeViewNodeTitleText(node: ViewNode | RawViewNode): string {
   const { formalId, title, typeSuffix } = node.title;
   const { prefix, numberPath } = formalId;
-  const numberPathString = numberPath.join(".");
+  const path = [prefix, ...numberPath].join(".");
   const typeSuffixString = typeSuffix ? ` - ${typeSuffix}` : "";
 
-  return `${prefix}.${numberPathString} - ${title}${typeSuffixString}`;
+  return `${path} - ${title}${typeSuffixString}`;
 }
 
 export function formatNotionIdFromUrl(
@@ -405,4 +407,43 @@ export function getSupportDocs(node: ViewNode) {
 
 export function getNonSupportDocs(node: ViewNode) {
   return node.subDocuments.filter((subDoc) => !isSupportDocType(subDoc.type));
+}
+
+export function handleAgents(
+  processedSectionsById: TProcessedSectionsById,
+  processedAgentsById: TProcessedSectionsById,
+) {
+  const agents = Object.values(processedAgentsById);
+  const agentArtifactIds = agents
+    .filter((page) =>
+      page.parents.some((parent) => parent.id === agentArtifactsSectionId),
+    )
+    .map((page) => page.id);
+  const listsOfSkyPrimitiveListsIds = agents
+    .filter((agent) => agent.nameString.toLowerCase() === "sky primitives")
+    .map((page) => page.id);
+  const skyPrimitiveListIds = agents
+    .filter((agent) =>
+      agent.parents.some((parent) =>
+        listsOfSkyPrimitiveListsIds.includes(parent.id),
+      ),
+    )
+    .map((page) => page.id);
+
+  const sectionsWithAgents = {
+    ...processedSectionsById,
+    ...processedAgentsById,
+  };
+
+  for (const section of Object.values(sectionsWithAgents)) {
+    if (section.id === agentArtifactsSectionId) {
+      section.children.push(...agentArtifactIds.map((id) => ({ id })));
+    }
+    section.isAgentArtifact = agentArtifactIds.includes(section.id);
+    section.isSkyPrimitive = section.parents.some((parent) =>
+      skyPrimitiveListIds.includes(parent.id),
+    );
+  }
+
+  return sectionsWithAgents;
 }

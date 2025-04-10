@@ -23,6 +23,9 @@ export const SCENARIO = "scenario";
 export const SCENARIO_VARIATION = "scenarioVariation";
 export const TENET = "tenet";
 export const ACTIVE_DATA = "activeData";
+export const AGENT = "agent";
+export const AGENT_ARTIFACT = "agentArtifact";
+export const SKY_PRIMITIVE = "skyPrimitive";
 
 export const atlasPageNames = [
   SCOPE,
@@ -35,6 +38,7 @@ export const atlasPageNames = [
   NEEDED_RESEARCH,
   ORIGINAL_CONTEXT_DATA,
   ACTIVE_DATA,
+  AGENT,
 ] as const;
 
 export const referencePageNames = [HUB, MASTER_STATUS] as const;
@@ -42,7 +46,6 @@ export const referencePageNames = [HUB, MASTER_STATUS] as const;
 export const allPageNames = [...atlasPageNames, ...referencePageNames] as const;
 
 export const pageIds: Record<PageName, string> = {
-  [MASTER_STATUS]: "37f256facc7e40dfa045564ebb347b12",
   [SCOPE]: "ebdb403a44bd4d169ec8f9330e955247",
   [ARTICLE]: "15e06a0d07364458a5caeb85d7b54408",
   [SECTION]: "06d1d4fa1cc44e88a06559d4082163a8",
@@ -53,20 +56,21 @@ export const pageIds: Record<PageName, string> = {
   [NEEDED_RESEARCH]: "effd5738033548a98ec1a7e99cbadd1d",
   [ORIGINAL_CONTEXT_DATA]: "e9f9f2a29abe4d5991495a148c755b41",
   [ACTIVE_DATA]: "5b566dd732464927b8eee6e1b2ff99d9",
+  [AGENT]: "1bbf2ff08d73808d9ce3e2122857e262",
+  [MASTER_STATUS]: "37f256facc7e40dfa045564ebb347b12",
   [HUB]: "8c1d950bbee04cc0a5c1a1e18842c224",
 } as const;
 
 export const apiKey = process.env.API_KEY;
 export const importApiKey = process.env.IMPORT_API_KEY;
 export const importApiUrl = process.env.IMPORT_API_URL;
-export const dataPath = "./data";
-export const outputPath = "./output";
 
 export const archivedMasterStatusId = "434486e6-0d5e-4541-9f00-40cb9bd67d1c";
 export const deferredMasterStatusId = "f38bf53d-96bd-4345-a403-c6629ed202a1";
 export const approvedMasterStatusId = "fe75a64f-585b-4d08-af00-ef8667d9c307";
 export const provisionalMasterStatusId = "3dbb9d9c-fd63-462b-99f3-1ce879f16768";
 export const placeholderMasterStatusId = "3edf54e3-be0e-4bbb-b008-502cfc23394e";
+export const agentArtifactsSectionId = "1b4f2ff0-8d73-8082-862b-dcd586862638";
 
 export const allowedPageFieldTypes = [
   "title",

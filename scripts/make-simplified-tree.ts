@@ -16,10 +16,7 @@ export function makeSimplifiedTree(treeMap: ViewNodeMap): string[] {
     printNodeTree(scope!);
   }
 
-  function printNodeTree(
-    node: ViewNode,
-    indent = 0,
-  ) {
+  function printNodeTree(node: ViewNode, indent = 0) {
     const title = makeViewNodeTitleText(node);
     const content = node.content
       .map((content) => content.text.map((text) => text.text).join("\n"))
@@ -28,7 +25,9 @@ export function makeSimplifiedTree(treeMap: ViewNodeMap): string[] {
     const supportDocs = getSupportDocs(node);
     const supportDocIds = supportDocs.map((supportDoc) => supportDoc.id);
     const nonSupportDocs = getNonSupportDocs(node);
-    const nonSupportDocIds = nonSupportDocs.map((nonSupportDoc) => nonSupportDoc.id);
+    const nonSupportDocIds = nonSupportDocs.map(
+      (nonSupportDoc) => nonSupportDoc.id,
+    );
 
     const linesToAdd = [
       `id: ${node.id}`,
@@ -52,4 +51,3 @@ export function makeSimplifiedTree(treeMap: ViewNodeMap): string[] {
 
   return textLines;
 }
-

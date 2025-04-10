@@ -15,7 +15,7 @@ import {
   TENET,
   TYPE_SPECIFICATION,
 } from "./constants.js";
-import type { ViewNodeInputs } from "./make-view-node-inputs.js";
+import type { ViewNodeInputs } from "./types/processed-data.js";
 import {
   type RawViewNode,
   type Item,
@@ -25,6 +25,7 @@ import {
 import {
   processRawViewNodeMap as addLinkedContentToViewNodes,
   isSupportDocType,
+  makeViewNodeTitleText,
 } from "./utils/index.js";
 import {
   getFirstElement,
@@ -71,6 +72,8 @@ export function processViewNodeInputs(viewNodeInputs: ViewNodeInputs) {
     simplifiedViewNodeTreeTxt,
   };
 }
+
+let skyPrimitiveCounter = 0;
 
 function buildViewNodeTree(viewNodeInputs: ViewNodeInputs) {
   const rawViewNodeMap: Record<string, RawViewNode> = {};
@@ -158,21 +161,39 @@ function buildSubDocumentsViewTree(
 
   let counter = startCounter;
 
-  for (const subDocument of sortedSubDocuments) {
+  sortedSubDocuments.forEach((subDocument, index) => {
     const { id, type, content, hubUrls, files } = subDocument;
+
+    const isAgentArtifact = subDocument.isAgentArtifact === true;
+    const isSkyPrimitive = subDocument.isSkyPrimitive === true;
+
+    if (isAgentArtifact) {
+      skyPrimitiveCounter = 0;
+    }
+    if (isSkyPrimitive) {
+      skyPrimitiveCounter += 1;
+    }
+
     const parentNumberPath = parentNode.title.formalId.numberPath;
     const parentType = parentNode.type;
     const parentSlugSuffix = parentNode.slugSuffix;
-    const parentPrefix = parentNode.title.formalId.prefix;
-
     const numberPath = [...parentNumberPath];
+    const parentPrefix = parentNode.title.formalId.prefix;
+    const prefix = isAgentArtifact
+      ? `${parentPrefix}.AG${index + 1}`
+      : parentPrefix;
+    const nextPartOfPath = isSkyPrimitive ? `P${skyPrimitiveCounter}` : counter;
 
-    if (parentType === CATEGORY) {
+    if (parentType === CATEGORY || isAgentArtifact) {
       numberPath.pop();
     }
 
     if (!isSupportDocType(type)) {
-      numberPath.push(counter);
+      numberPath.push(nextPartOfPath);
+    }
+
+    if (isAgentArtifact) {
+      numberPath.splice(0, numberPath.length);
     }
 
     const slugSuffix = generateSlugSuffix(parentSlugSuffix, id);
@@ -188,7 +209,7 @@ function buildSubDocumentsViewTree(
 
     const title = {
       formalId: {
-        prefix: parentPrefix,
+        prefix,
         numberPath,
       },
       title: makeDocTitle(subDocument),
@@ -222,8 +243,7 @@ function buildSubDocumentsViewTree(
 
     nodeCounts[type] += 1;
     debugPrint(newNode);
-  }
-
+  });
   return subDocumentsViewNodeTree;
 }
 
@@ -327,13 +347,6 @@ function generateSlugSuffix(parentSlugSuffix: string, ownId: string) {
 function makeViewNodeSlug(node: RawViewNode): string {
   const titleSlug = makeViewNodeTitleText(node).replaceAll(/[- _/]+/g, "_");
   return `${titleSlug}-${node.slugSuffix}`;
-}
-
-function makeViewNodeTitleText(node: RawViewNode): string {
-  const { formalId, title } = node.title;
-  const { prefix, numberPath } = formalId;
-  const numberPathString = numberPath.join(".");
-  return `${prefix}.${numberPathString} - ${title}`;
 }
 
 function debugPrint(newNode: RawViewNode) {
