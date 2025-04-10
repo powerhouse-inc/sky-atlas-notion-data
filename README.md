@@ -91,6 +91,7 @@ The project generates several data structures that serve different purposes:
 2. **View Node Map**: This is a flattened representation of the tree, where each node is indexed by its ID. It contains redundant data compared to the tree structure because it's used in the Atlas Next.js app to prerender open routes to nodes. The map format allows for quick lookups by ID without having to traverse the tree.
 
 3. **Processing Flow**:
+
    - The raw Notion data is first processed to extract basic information and establish the structure.
    - Items in the Atlas are numbered during this initial processing.
    - The view node content is then processed, which may contain links to other items in the Atlas.
@@ -98,6 +99,7 @@ The project generates several data structures that serve different purposes:
    - This two-step process ensures that references between items are consistent and correctly numbered.
 
 4. **Notion UUIDs and Slugs**:
+
    - Notion uses UUIDs (Universally Unique Identifiers) for all its items.
    - The slug lookup mechanism is created by adding a suffix which is part of the item's parent UUID.
    - This approach is necessary because items can have multiple parents in the Notion structure.

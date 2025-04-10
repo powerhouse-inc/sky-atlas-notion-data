@@ -1,0 +1,67 @@
+[
+  {
+    "name": "Sub-item",
+    "id": "%3D%40pI",
+    "type": "relation"
+  },
+  {
+    "name": "Tenets",
+    "id": "Bonj",
+    "type": "relation"
+  },
+  {
+    "name": "ID",
+    "id": "D%40%3E%3B",
+    "type": "unique_id"
+  },
+  {
+    "name": "Parent item",
+    "id": "SuWy",
+    "type": "relation"
+  },
+  {
+    "name": "Needed Research",
+    "id": "UjqC",
+    "type": "relation"
+  },
+  {
+    "name": "Formal Doc ID",
+    "id": "ZZr%7C",
+    "type": "rich_text"
+  },
+  {
+    "name": "Active Data",
+    "id": "fBjB",
+    "type": "relation"
+  },
+  {
+    "name": "Master Status",
+    "id": "kiLR",
+    "type": "relation"
+  },
+  {
+    "name": "Content",
+    "id": "oxJK",
+    "type": "rich_text"
+  },
+  {
+    "name": "Agent Name",
+    "id": "tUbu",
+    "type": "select"
+  },
+  {
+    "name": "Doc Type",
+    "id": "uqtf",
+    "type": "select"
+  },
+  {
+    "name": "Annotations",
+    "id": "%7Bwun",
+    "type": "relation"
+  },
+  {
+    "name": "Document Name",
+    "id": "title",
+    "type": "title"
+  }
+]

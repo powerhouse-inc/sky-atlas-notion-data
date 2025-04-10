@@ -3,26 +3,24 @@ import {
   getMasterStatusNames,
   type Items,
   type TProcessedHubById,
-  type Item,
   ProcessedSection,
 } from "./index.js";
 import type {
   AtlasPageName,
   ProcessedAtlasPagesById,
   ProcessedAtlasPagesByIdByPageName,
+  ViewNodeInputs,
 } from "./types/processed-data.js";
 
 export async function makeViewNodeInputs(args: {
   processedAtlasPagesByIdByPageName: ProcessedAtlasPagesByIdByPageName;
   processedHubById: TProcessedHubById;
   masterStatusNameStrings: Record<string, string>;
-  outputPath: string;
 }) {
   const {
     processedAtlasPagesByIdByPageName,
     processedHubById,
     masterStatusNameStrings,
-    outputPath,
   } = args;
 
   const viewNodeInputs = {} as ViewNodeInputs;
@@ -30,8 +28,6 @@ export async function makeViewNodeInputs(args: {
   for (const pageName of Object.keys(processedAtlasPagesByIdByPageName)) {
     const items = makeViewNodeInput(
       processedAtlasPagesByIdByPageName[pageName as AtlasPageName],
-      pageName as AtlasPageName,
-      outputPath,
       masterStatusNameStrings,
       processedHubById,
     );
@@ -43,12 +39,8 @@ export async function makeViewNodeInputs(args: {
 
   return viewNodeInputs;
 }
-export type ViewNodeInputs = Record<string, Item>;
-
 function makeViewNodeInput(
   processedAtlasPagesById: ProcessedAtlasPagesById,
-  pageName: AtlasPageName,
-  parsedPath: string,
   masterStatusNameStrings: Record<string, string>,
   processedHubById: TProcessedHubById,
 ) {
@@ -77,9 +69,12 @@ function makeViewNodeInput(
     };
 
     if (ProcessedSection.safeParse(processed).success) {
-      const { parents, number } = ProcessedSection.parse(processed);
+      const { parents, number, isAgentArtifact, isSkyPrimitive } =
+        ProcessedSection.parse(processed);
       items[processed.id].parents = getIds(parents);
       items[processed.id].number = number;
+      items[processed.id].isAgentArtifact = isAgentArtifact ?? false;
+      items[processed.id].isSkyPrimitive = isSkyPrimitive ?? false;
     }
   }
 

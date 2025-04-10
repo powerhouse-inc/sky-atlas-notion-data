@@ -88,3 +88,4 @@ export function removeLastNumberSection(input: string): string {
 export function isSectionItem(item: Item): item is SectionItem {
   return isSectionDocType(item.type);
 }
+

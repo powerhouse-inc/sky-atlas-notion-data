@@ -32,7 +32,7 @@ export type ViewNodeTree = ViewNode[];
 export type ViewNodeTitle = {
   formalId: {
     prefix: string;
-    numberPath: number[];
+    numberPath: (number | string)[];
   };
   title: string;
   typeSuffix?: string;
@@ -54,12 +54,16 @@ export type DefaultItem = CommonItemProperties & {
   type: TDocType;
   parents?: undefined;
   number?: undefined;
+  isAgentArtifact?: undefined;
+  isSkyPrimitive?: undefined;
 };
 
 export type SectionItem = CommonItemProperties & {
   type: TSectionDocType;
   parents: string[];
   number: number | null;
+  isAgentArtifact?: boolean;
+  isSkyPrimitive?: boolean;
 };
 
 export type Item = DefaultItem | SectionItem;

@@ -35,6 +35,8 @@ import {
 } from "./utils/processing.js";
 import {
   ACTIVE_DATA,
+  AGENT,
+  agentArtifactsSectionId,
   ANNOTATION,
   ARTICLE,
   HUB,
@@ -48,7 +50,8 @@ import {
   TENET,
 } from "./constants.js";
 import { camelCase } from "change-case";
-import { type TDocType } from "./types/processed-data.js";
+import { type TNotionUniqueId, type TDocType } from "./types/processed-data.js";
+import { AgentsPageSchema } from "./types/page-schemas/agent.js";
 
 function processScopes(pages: unknown): TProcessedScopesById {
   const scopesPages = ScopesPageSchema.parse(pages);
@@ -181,6 +184,49 @@ function processSections(pages: unknown): TProcessedSectionsById {
       ],
       masterStatus: getRelations(properties["Master Status"]),
       files: getProcessedFiles(properties["Files & media"]),
+    };
+  }
+
+  return processed;
+}
+
+function processAgents(pages: unknown): TProcessedSectionsById {
+  const agentsPages = AgentsPageSchema.parse(pages);
+  const processed: TProcessedSectionsById = {};
+
+  for (const page of agentsPages) {
+    const id = page.id;
+    const properties = page.properties;
+    const docNo = getTextFromTitle(properties["Document Name"]);
+    const name = getTextFromTitle(properties["Document Name"]);
+    const nameString = makeProcessedRichTextString(name);
+    const docNoString = nameString;
+    const children = [
+      ...getRelations(properties["Sub-item"]),
+      ...getRelations(properties.Annotations),
+      ...getRelations(properties.Tenets),
+      ...getRelations(properties["Active Data"]),
+      ...getRelations(properties["Needed Research"]),
+    ];
+    const parentDoc = getRelations(properties["Parent item"]);
+    const parents = parentDoc.length
+      ? parentDoc
+      : [{ id: agentArtifactsSectionId }];
+
+    processed[id] = {
+      id,
+      children,
+      parents,
+      docNo,
+      name,
+      docNoString,
+      nameString,
+      hub: getRelations(properties["P0 🅗🅤🅑"]),
+      number: getNumberFromNotionUniqueId(properties.ID),
+      type: camelCase(getTextFromSelect(properties["Doc Type"])) as TDocType,
+      content: [{ text: getContentFromRichText(properties.Content) }],
+      masterStatus: getRelations(properties["Master Status"]),
+      files: [],
     };
   }
 
@@ -474,11 +520,18 @@ function getNumberFromNotionNumber(
   return notionNumber?.number;
 }
 
+function getNumberFromNotionUniqueId(
+  notionUniqueId: TNotionUniqueId | null | undefined,
+) {
+  return notionUniqueId?.unique_id.number;
+}
+
 export const processors = {
   [MASTER_STATUS]: processMasterStatus,
   [ARTICLE]: processArticles,
   [SCOPE]: processScopes,
   [SECTION]: processSections,
+  [AGENT]: processAgents,
   [ANNOTATION]: processAnnotations,
   [TENET]: processTenets,
   [SCENARIO]: processScenarios,
