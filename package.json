@@ -12,13 +12,15 @@
     "dist"
   ],
   "bin": {
-    "make-tree": "./dist/scripts/make-tree.js"
+    "make-atlas-data": "./dist/scripts/make-atlas-data.js",
+    "make-atlas-data-dev": "./dist/scripts/make-atlas-data.js --useLocalData --skipImportApi --skipGithubSnapshot"
   },
   "scripts": {
-    "make-tree": "bun run ./scripts/make-tree.ts",
+    "make-atlas-data": "bun run ./scripts/make-atlas-data.ts",
+    "make-atlas-data-dev": "bun run make-atlas-data --useLocalData --skipImportApi --skipGithubSnapshot",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "build": "tsc",
+    "build": "tsc && bun run format",
     "prepublishOnly": "bun run build"
   },
   "devDependencies": {

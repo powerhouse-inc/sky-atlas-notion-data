@@ -6,7 +6,7 @@ import {
   getSupportDocs,
 } from "../src/index.js";
 
-export function makeSimplifiedTree(treeMap: ViewNodeMap): string[] {
+export function makeSimplifiedAtlasData(treeMap: ViewNodeMap): string[] {
   const scopes = Object.values(treeMap).filter(
     (node) => node?.type === "scope",
   );

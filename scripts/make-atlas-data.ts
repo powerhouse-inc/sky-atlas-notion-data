@@ -4,32 +4,51 @@ import {
   fetchAtlasNotionPages,
   getNotionPage,
   HUB,
-  makeViewNodeInputs,
+  makeNotionDataById,
   MASTER_STATUS,
   processAtlasNotionPages,
   processNotionPage,
-  processViewNodeInputs,
+  buildAtlasDataFromNotionData,
   type TProcessedSectionsById,
-  type TProcessedHubById,
-  type TProcessedMasterStatusById,
   type ViewNodeMap,
   type ViewNodeTree,
   handleAgents,
+  type TProcessedMasterStatusById,
+  type TProcessedHubById,
+  DEFAULT_OUTPUT_PATH,
 } from "../src/index.js";
 import { parseArgs } from "util";
-import { Client } from "@notionhq/client";
 import fs from "fs";
 import { mkdir } from "node:fs/promises";
 import { Octokit } from "octokit";
 import { handleEnv } from "./handleEnv.js";
-import { writeJsonToFile } from "./utils.js";
+import { writeJsonToFile, writeTxtToFile } from "./utils.js";
 
 handleEnv();
-makeTree();
+main();
 
-export async function makeTree() {
-  const defaultOutputPath = "data";
-
+/**
+ * Main function that orchestrates the entire process of fetching Notion data,
+ * processing it, and optionally committing it to GitHub or posting to an import API.
+ * 
+ * Command line arguments:
+ * - outputPath: Specify the output directory for generated files (default: from env or DEFAULT_OUTPUT_PATH)
+ * - useLocalData: Use locally cached data instead of fetching from Notion
+ * - skipImportApi: Skip posting the generated tree to the import API
+ * - skipGithubSnapshot: Skip committing the generated tree to GitHub
+ * - help: Display help message
+ * 
+ * Environment variables:
+ * - API_KEY: Notion API key
+ * - IMPORT_API_URL: URL for the import API
+ * - IMPORT_API_KEY: API key for the import API
+ * - GITHUB_TOKEN: GitHub token for committing snapshots
+ * - OUTPUT_PATH: Output directory for generated files
+ * - USE_LOCAL_DATA: Set to "true" to use data from local files
+ * - SKIP_IMPORT_API: Set to "true" to skip posting to import API
+ * - SKIP_GITHUB_SNAPSHOT: Set to "true" to skip committing snapshots to GitHub
+ */
+async function main() {
   const { values } = parseArgs({
     args: process.argv.slice(2),
     options: {
@@ -56,13 +75,77 @@ export async function makeTree() {
     displayHelp();
   }
 
-  const outputPath = values.outputPath ?? defaultOutputPath;
+  const notionApiKey = process.env.API_KEY;
+  const importApiUrl = process.env.IMPORT_API_URL;
+  const importApiKey = process.env.IMPORT_API_KEY;
+  const githubToken = process.env.GITHUB_TOKEN;
+  const outputPath =
+    values.outputPath ?? process.env.OUTPUT_PATH ?? DEFAULT_OUTPUT_PATH;
   const useLocalData =
     values.useLocalData ?? process.env.USE_LOCAL_DATA === "true";
   const skipImportApi =
     values.skipImportApi ?? process.env.SKIP_IMPORT_API === "true";
   const skipGithubSnapshot =
     values.skipGithubSnapshot ?? process.env.SKIP_GITHUB_SNAPSHOT === "true";
+
+  const { viewNodeTree, viewNodeMap, simplifiedViewNodeTreeTxt } =
+    await makeAtlasData({
+      outputPath,
+      notionApiKey,
+      useLocalData,
+    });
+
+  if (!skipGithubSnapshot) {
+    if (!githubToken) {
+      console.warn(
+        "GITHUB_TOKEN is not set, skipping snapshot commit to Github"
+      );
+    } else {
+      await commitSnapshotToGithub({
+        githubToken,
+        viewNodeTree,
+        simplifiedViewNodeTreeTxt,
+      });
+    }
+  }
+
+  if (!skipImportApi) {
+    if (!importApiKey) {
+      console.warn(
+        "WARNING: IMPORT_API_KEY is not set, skipping import API post"
+      );
+    }
+    if (!importApiUrl) {
+      console.warn(
+        "WARNING: IMPORT_API_URL is not set, skipping import API post"
+      );
+    }
+    if (importApiKey && importApiUrl) {
+      await postToImportApi({ importApiKey, importApiUrl, viewNodeMap });
+    }
+  }
+}
+
+/**
+ * Fetches and processes Notion data to create a structured tree representation.
+ * 
+ * @param outputPath - Directory where output files will be stored
+ * @param notionApiKey - Notion API key for fetching data (optional if useLocalData is true)
+ * @param useLocalData - Whether to use locally cached data instead of fetching from Notion
+ * @returns Object containing the generated tree structure and related data
+ */
+async function makeAtlasData(args: {
+  outputPath: string;
+  notionApiKey?: string;
+  useLocalData?: boolean;
+}) {
+  const { notionApiKey, outputPath, useLocalData = false } = args;
+
+  if (!notionApiKey && !useLocalData) {
+    console.warn(
+      "  WARNING: Notion API_KEY env variable is not set, attempting to use data from local files."
+    );
+  }
 
   const notionPagesOutputPath = `${outputPath}/notion-pages`;
   const processedOutputPath = `${outputPath}/processed`;
@@ -75,15 +158,15 @@ export async function makeTree() {
   ];
 
   // Check if local data exists when useLocalData is true
-  if (useLocalData) {
-    const missingFiles = [];
-
-    // Check if directories exist
-    for (const dir of directories) {
-      if (!fs.existsSync(dir)) {
-        missingFiles.push(`Directory: ${dir}`);
-      }
+  if (useLocalData || !notionApiKey) {
+    if (!fs.existsSync(notionPagesOutputPath)) {
+      console.error(
+        "Error: --useLocalData option requires existing local data, but the notion-pages directory is missing"
+      );
+      process.exit(1);
     }
+
+    const missingFiles: string[] = [];
 
     // Check if required Notion page files exist
     const requiredNotionFiles = [
@@ -104,11 +187,11 @@ export async function makeTree() {
 
     if (missingFiles.length > 0) {
       console.error(
-        "Error: --useLocalData option requires existing local data, but the following files/directories are missing:",
+        "Error: --useLocalData option requires existing local data, but the following files/directories are missing:"
       );
       missingFiles.forEach((item) => console.error(`  - ${item}`));
       console.error(
-        "\nPlease run the script without --useLocalData first to fetch data from Notion.",
+        "\nPlease run the script without --useLocalData first to fetch data from Notion."
       );
       process.exit(1);
     }
@@ -118,17 +201,15 @@ export async function makeTree() {
     await mkdir(dir, { recursive: true });
   }
 
-  const notion = new Client({ auth: process.env.API_KEY });
-
   const masterStatusNotionPage = await getNotionPage({
-    notion,
+    notionApiKey,
     outputPath,
     pageName: MASTER_STATUS,
     useLocalData,
     noFilter: true,
   });
   const hubNotionPage = await getNotionPage({
-    notion,
+    notionApiKey,
     outputPath,
     pageName: HUB,
     useLocalData,
@@ -136,7 +217,7 @@ export async function makeTree() {
   });
 
   const fetchAtlasNotionPagesResult = await fetchAtlasNotionPages({
-    notion,
+    notionApiKey,
     outputPath,
     useLocalData,
   });
@@ -144,50 +225,48 @@ export async function makeTree() {
   if (!useLocalData) {
     await writeJsonToFile(
       `${notionPagesOutputPath}/${MASTER_STATUS}.json`,
-      masterStatusNotionPage,
+      masterStatusNotionPage
     );
 
     await writeJsonToFile(
       `${notionPagesOutputPath}/${HUB}.json`,
-      hubNotionPage,
+      hubNotionPage
     );
 
     for (const pageName of atlasPageNames) {
       await writeJsonToFile(
         `${notionPagesOutputPath}/${pageName}.json`,
-        fetchAtlasNotionPagesResult[pageName],
+        fetchAtlasNotionPagesResult[pageName]
       );
     }
   }
 
-  const processedMasterStatusById = (await processNotionPage({
-    page: masterStatusNotionPage,
-    pageName: MASTER_STATUS,
-    outputPath,
-  })) as TProcessedMasterStatusById;
+  const processedMasterStatusById =
+    await processNotionPage<TProcessedMasterStatusById>({
+      page: masterStatusNotionPage,
+      pageName: MASTER_STATUS,
+    });
 
   await writeJsonToFile(
     `${processedOutputPath}/${MASTER_STATUS}.json`,
-    processedMasterStatusById,
+    processedMasterStatusById
   );
 
-  const processedHubById = (await processNotionPage({
+  const processedHubById = await processNotionPage<TProcessedHubById>({
     page: hubNotionPage,
     pageName: HUB,
-    outputPath,
-  })) as TProcessedHubById;
+  });
 
   await writeJsonToFile(`${processedOutputPath}/${HUB}.json`, processedHubById);
 
-  const processedAtlasPagesByIdByPageName = await processAtlasNotionPages({
-    atlasNotionPages: fetchAtlasNotionPagesResult,
-    outputPath,
-  });
+  const processedAtlasPagesByIdByPageName = await processAtlasNotionPages(
+    fetchAtlasNotionPagesResult
+  );
 
   for (const pageName of atlasPageNames) {
     await writeJsonToFile(
       `${processedOutputPath}/${pageName}.json`,
-      processedAtlasPagesByIdByPageName[pageName],
+      processedAtlasPagesByIdByPageName[pageName]
     );
   }
 
@@ -200,27 +279,27 @@ export async function makeTree() {
 
   await writeJsonToFile(
     `${parsedOutputPath}/${MASTER_STATUS}.json`,
-    masterStatusNameStrings,
+    masterStatusNameStrings
   );
 
   const { section, agent } = processedAtlasPagesByIdByPageName;
   const sectionWithAgents = handleAgents(
     section as TProcessedSectionsById,
-    agent as TProcessedSectionsById,
+    agent as TProcessedSectionsById
   );
   processedAtlasPagesByIdByPageName.section = sectionWithAgents;
 
-  const viewNodeInputs = await makeViewNodeInputs({
+  const notionDataById = await makeNotionDataById({
     processedAtlasPagesByIdByPageName,
     processedHubById,
     masterStatusNameStrings,
   });
 
-  console.log("created view node inputs");
+  console.log("created notion data by id");
 
   await writeJsonToFile(
-    `${parsedOutputPath}/view-node-inputs.json`,
-    viewNodeInputs,
+    `${parsedOutputPath}/notion-data-by-id.json`,
+    notionDataById
   );
 
   const {
@@ -229,32 +308,44 @@ export async function makeTree() {
     slugLookup,
     nodeCountsText,
     simplifiedViewNodeTreeTxt,
-  } = processViewNodeInputs(viewNodeInputs);
+  } = buildAtlasDataFromNotionData(notionDataById);
 
-  console.log("processed view node inputs");
+  console.log("built atlas data from notion data");
   console.log(nodeCountsText);
 
-  await writeJsonToFile(`${outputPath}/view-node-tree.json`, viewNodeTree);
+  await writeJsonToFile(`${outputPath}/atlas-data.json`, viewNodeTree);
   await writeJsonToFile(`${outputPath}/view-node-map.json`, viewNodeMap);
   await writeJsonToFile(`${outputPath}/slug-lookup.json`, slugLookup);
+  await writeTxtToFile(`${outputPath}/view-node-counts.txt`, nodeCountsText);
+  await writeTxtToFile(
+    `${outputPath}/simplified-atlas-tree.txt`,
+    simplifiedViewNodeTreeTxt
+  );
+  // for legacy use
+  await writeJsonToFile(`${outputPath}/view-node-tree.json`, viewNodeTree);
 
-  if (!skipGithubSnapshot) {
-    await commitSnapshotToGithub(viewNodeTree, simplifiedViewNodeTreeTxt);
-  }
-
-  if (!skipImportApi) {
-    await postToImportApi(viewNodeMap);
-  }
+  return {
+    viewNodeTree,
+    viewNodeMap,
+    slugLookup,
+    nodeCountsText,
+    simplifiedViewNodeTreeTxt,
+  };
 }
 
-async function commitSnapshotToGithub(
-  viewNodeTree: ViewNodeTree,
-  simplifiedViewNodeTreeTxt: string,
-) {
-  const githubToken = process.env.GITHUB_TOKEN;
-  if (!githubToken) {
-    throw new Error("GITHUB_TOKEN is not set");
-  }
+/**
+ * Commits the generated tree structure to GitHub as a snapshot.
+ * 
+ * @param githubToken - GitHub token for authentication
+ * @param viewNodeTree - The generated tree structure to commit
+ * @param simplifiedViewNodeTreeTxt - Text representation of the simplified tree
+ */
+async function commitSnapshotToGithub(args: {
+  githubToken: string;
+  viewNodeTree: ViewNodeTree;
+  simplifiedViewNodeTreeTxt: string;
+}) {
+  const { githubToken, viewNodeTree, simplifiedViewNodeTreeTxt } = args;
 
   const octokit = new Octokit({ auth: githubToken });
   const owner = "powerhouse-inc";
@@ -332,16 +423,19 @@ async function commitSnapshotToGithub(
   }
 }
 
-async function postToImportApi(viewNodeMap: ViewNodeMap) {
-  const importApiUrl = process.env.IMPORT_API_URL;
-  const importApiKey = process.env.IMPORT_API_KEY;
-
-  if (!importApiUrl) {
-    throw new Error("IMPORT_API_URL is not set");
-  }
-  if (!importApiKey) {
-    throw new Error("IMPORT_API_KEY is not set");
-  }
+/**
+ * Posts the generated tree structure to an import API.
+ * 
+ * @param importApiKey - API key for authentication with the import API
+ * @param importApiUrl - URL of the import API endpoint
+ * @param viewNodeMap - Map of nodes in the tree to post to the API
+ */
+async function postToImportApi(args: {
+  importApiKey: string;
+  importApiUrl: string;
+  viewNodeMap: ViewNodeMap;
+}) {
+  const { importApiKey, importApiUrl, viewNodeMap } = args;
   try {
     const request = new Request(importApiUrl, {
       method: "POST",
@@ -362,6 +456,10 @@ async function postToImportApi(viewNodeMap: ViewNodeMap) {
   }
 }
 
+/**
+ * Displays help information about the script's usage, options, and environment variables.
+ * Exits the process after displaying the help message.
+ */
 function displayHelp() {
   console.log(`
 MIPS Parser - Notion to Tree Structure Converter

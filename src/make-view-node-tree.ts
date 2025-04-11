@@ -1,4 +1,4 @@
-import { makeSimplifiedTree } from "../scripts/make-simplified-tree.js";
+import { makeSimplifiedAtlasData } from "../scripts/make-simplified-atlas-data.js";
 import {
   ACTIVE_DATA,
   ACTIVE_DATA_CONTROLLER,
@@ -15,7 +15,7 @@ import {
   TENET,
   TYPE_SPECIFICATION,
 } from "./constants.js";
-import type { ViewNodeInputs } from "./types/processed-data.js";
+import type { NotionDataById } from "./types/processed-data.js";
 import {
   type RawViewNode,
   type Item,
@@ -56,11 +56,11 @@ const nodeCounts = {
   [ACTIVE_DATA]: 0,
 };
 
-export function processViewNodeInputs(viewNodeInputs: ViewNodeInputs) {
-  const rawViewNodeMap = buildViewNodeTree(viewNodeInputs);
+export function buildAtlasDataFromNotionData(notionDataById: NotionDataById) {
+  const rawViewNodeMap = buildViewNodeTree(notionDataById);
   const viewNodeMap = addLinkedContentToViewNodes(rawViewNodeMap, slugLookup);
   const viewNodeTree = makeViewNodeTreeFromViewNodeMap(viewNodeMap);
-  const simplifiedViewNodeTreeTxt = makeSimplifiedTree(viewNodeMap).join("\n");
+  const simplifiedViewNodeTreeTxt = makeSimplifiedAtlasData(viewNodeMap).join("\n");
   const nodeCountsText = printNodeCounts();
 
   return {
@@ -75,7 +75,7 @@ export function processViewNodeInputs(viewNodeInputs: ViewNodeInputs) {
 
 let skyPrimitiveCounter = 0;
 
-function buildViewNodeTree(viewNodeInputs: ViewNodeInputs) {
+function buildViewNodeTree(viewNodeInputs: NotionDataById) {
   const rawViewNodeMap: Record<string, RawViewNode> = {};
 
   /* The scopes are the root nodes of the Atlas view tree */
@@ -147,7 +147,7 @@ function buildViewNodeTree(viewNodeInputs: ViewNodeInputs) {
 function buildSubDocumentsViewTree(
   parentItem: Item,
   parentNode: RawViewNode,
-  viewNodeInputs: ViewNodeInputs,
+  viewNodeInputs: NotionDataById,
   viewNodeMap: RawViewNodeMap,
   startCounter: number,
 ) {
@@ -279,7 +279,7 @@ function printNodeCounts() {
 
 function getSubDocumentsForParentItem(
   parentItem: Item,
-  viewNodeInputs: ViewNodeInputs,
+  viewNodeInputs: NotionDataById,
 ) {
   return Object.values(viewNodeInputs).filter((input) => {
     const parentChildrenHasItem = parentItem.children.includes(input.id);

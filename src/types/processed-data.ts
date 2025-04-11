@@ -375,4 +375,4 @@ export type FetchAndProcessNotionPagesResult = {
     hub: TProcessedHubById;
   };
 };
-export type ViewNodeInputs = Record<string, Item>;
+export type NotionDataById = Record<string, Item>;

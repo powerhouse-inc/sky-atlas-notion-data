@@ -1,6 +1,8 @@
 import { type QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints.js";
 import { type PageName } from "./types/processed-data.js";
 
+export const DEFAULT_OUTPUT_PATH = "data";
+
 export const MASTER_STATUS = "masterStatus";
 export const ORIGINAL_CONTEXT_DATA = "originalContextData";
 export const HUB = "hub";

@@ -9,10 +9,10 @@ import type {
   AtlasPageName,
   ProcessedAtlasPagesById,
   ProcessedAtlasPagesByIdByPageName,
-  ViewNodeInputs,
+  NotionDataById,
 } from "./types/processed-data.js";
 
-export async function makeViewNodeInputs(args: {
+export async function makeNotionDataById(args: {
   processedAtlasPagesByIdByPageName: ProcessedAtlasPagesByIdByPageName;
   processedHubById: TProcessedHubById;
   masterStatusNameStrings: Record<string, string>;
@@ -23,10 +23,10 @@ export async function makeViewNodeInputs(args: {
     masterStatusNameStrings,
   } = args;
 
-  const viewNodeInputs = {} as ViewNodeInputs;
+  const viewNodeInputs = {} as NotionDataById;
 
   for (const pageName of Object.keys(processedAtlasPagesByIdByPageName)) {
-    const items = makeViewNodeInput(
+    const items = makeNotionDataForPage(
       processedAtlasPagesByIdByPageName[pageName as AtlasPageName],
       masterStatusNameStrings,
       processedHubById,
@@ -39,7 +39,7 @@ export async function makeViewNodeInputs(args: {
 
   return viewNodeInputs;
 }
-function makeViewNodeInput(
+function makeNotionDataForPage(
   processedAtlasPagesById: ProcessedAtlasPagesById,
   masterStatusNameStrings: Record<string, string>,
   processedHubById: TProcessedHubById,
