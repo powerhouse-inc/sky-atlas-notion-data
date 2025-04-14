@@ -10,6 +10,7 @@ import {
   ScopesPageSchema,
   SectionsPageSchema,
   TenetsPageSchema,
+  type TStringFormula,
   type TNotionNumber,
   type TProcessedActiveDataById,
   type TProcessedAnnotationsById,
@@ -222,7 +223,7 @@ function processAgents(pages: unknown): TProcessedSectionsById {
       docNoString,
       nameString,
       hub: getRelations(properties["P0 🅗🅤🅑"]),
-      number: getNumberFromNotionUniqueId(properties.ID),
+      number: getNumberFromNotionStringFormula(properties["No."]),
       type: camelCase(getTextFromSelect(properties["Doc Type"])) as TDocType,
       content: [{ text: getContentFromRichText(properties.Content) }],
       masterStatus: getRelations(properties["Master Status"]),
@@ -524,6 +525,17 @@ function getNumberFromNotionUniqueId(
   notionUniqueId: TNotionUniqueId | null | undefined,
 ) {
   return notionUniqueId?.unique_id.number;
+}
+
+export function getNumberFromNotionStringFormula(
+  notionStringFormula: TStringFormula | null | undefined,
+) {
+  const numberString = notionStringFormula?.formula?.string;
+  const number = Number(numberString);
+  if (isNaN(number)) {
+    return null;
+  }
+  return number;
 }
 
 export const processors = {
