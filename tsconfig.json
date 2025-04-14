@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
     "incremental": true,
     "target": "ESNext",
     "module": "NodeNext",
@@ -14,7 +15,7 @@
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "lib": ["esnext"],
+    "lib": ["esnext", "DOM"],
     "jsx": "react-jsx",
   },
   "include": ["**/*"],

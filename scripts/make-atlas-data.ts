@@ -16,13 +16,15 @@ import {
   type TProcessedMasterStatusById,
   type TProcessedHubById,
   DEFAULT_OUTPUT_PATH,
+  makeHtmlDocumentViewNodeMap,
 } from "../src/index.js";
 import { parseArgs } from "util";
 import fs from "fs";
 import { mkdir } from "node:fs/promises";
 import { Octokit } from "octokit";
 import { handleEnv } from "./handleEnv.js";
-import { writeJsonToFile, writeTxtToFile } from "./utils.js";
+import { writeHtmlToFile, writeJsonToFile, writeTxtToFile } from "./utils.js";
+import { makeAtlasDataHtmlDocument } from "../src/components/make-atlas-data-html-string.js";
 
 handleEnv();
 main();
@@ -324,6 +326,11 @@ async function makeAtlasData(args: {
   // for legacy use
   await writeJsonToFile(`${outputPath}/view-node-tree.json`, viewNodeTree);
 
+  const htmlDocument = await makeAtlasDataHtmlDocument(viewNodeTree);
+  await writeHtmlToFile(`${outputPath}/atlas-data.html`, htmlDocument);
+  await writeJsonToFile(`${outputPath}/atlas-data-html.json`, htmlDocument);
+  const htmlDocumentViewNodeMap = await makeHtmlDocumentViewNodeMap(viewNodeMap);
+  await writeJsonToFile(`${outputPath}/atlas-data-html-view-node-map.json`, htmlDocumentViewNodeMap);
   return {
     viewNodeTree,
     viewNodeMap,

@@ -7,3 +7,7 @@ export async function writeJsonToFile(filePath: `${string}.json`, data: any) {
 export async function writeTxtToFile(filePath: `${string}.txt`, data: string) {
   await writeFile(filePath, data);
 }
+
+export async function writeHtmlToFile(filePath: `${string}.html`, data: string) {
+  await writeFile(filePath, data);
+}

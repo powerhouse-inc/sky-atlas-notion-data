@@ -25,6 +25,7 @@ import {
   type TSelect,
 } from "../types/index.js";
 import { agentArtifactsSectionId } from "../constants.js";
+import { makeAtlasDataHtmlDocument } from "../components/make-atlas-data-html-string.js";
 
 export function getTextFromTitle(titleField: TTitleField): TProcessedRichText {
   const title = titleField?.title ?? [];
@@ -102,6 +103,14 @@ export function getIds(relations: any[]): string[] {
   return relations?.map((r) => r?.id) ?? [];
 }
 
+export async function makeHtmlDocumentViewNodeMap(viewNodeMap:  ViewNodeMap) {
+  const htmlStringViewNodeMap: Record<string, string> = {};
+  for (const slugSuffix in viewNodeMap) {
+    const viewNode = viewNodeMap[slugSuffix]!;
+    htmlStringViewNodeMap[slugSuffix] = await makeAtlasDataHtmlDocument([viewNode]);
+  }
+  return htmlStringViewNodeMap;
+}
 export function processRawViewNodeMap(
   rawViewNodeMap: RawViewNodeMap,
   slugLookup: Record<string, string>,
@@ -336,12 +345,12 @@ export function getSlugWithSuffix(
   return `${id}|${slugFromLookup}`;
 }
 
-export function makeViewNodeUrl(node: RawViewNode) {
+export function makeViewNodeUrl(node: ViewNode | RawViewNode) {
   const titleSlug = makeViewNodeTitleSlug(node);
   return `/${titleSlug}/${node.slugSuffix}`;
 }
 
-export function makeViewNodeTitleSlug(node: RawViewNode) {
+export function makeViewNodeTitleSlug(node: ViewNode | RawViewNode) {
   return makeViewNodeTitleText(node).replaceAll(/[- _/]+/g, "_");
 }
 
@@ -383,6 +392,12 @@ export function formatUUID(uuid: string): string {
     12,
     16,
   )}-${uuid.substring(16, 20)}-${uuid.substring(20)}`;
+}
+
+export function makeViewNodeAtlasId(node: ViewNode) {
+  const { formalId } = node.title;
+  const { prefix, numberPath } = formalId;
+  return `${prefix}.${numberPath.join(".")}`;
 }
 
 export function isSectionDocType(docType: string): docType is TSectionDocType {
