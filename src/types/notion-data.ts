@@ -7,6 +7,16 @@ import {
 import { z } from "zod";
 import { type AtlasPageName } from "./processed-data.js";
 
+export const StringFormula = z.object({
+  type: z.literal("formula"),
+  formula: z.object({
+    type: z.literal("string"),
+    string: z.string().nullish(),
+  }).nullish(),
+});
+
+export type TStringFormula = z.infer<typeof StringFormula>;
+
 export const RelationArray = z
   .array(z.object({ id: z.string().nullish() }).nullish())
   .nullish();

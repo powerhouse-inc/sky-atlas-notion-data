@@ -10,6 +10,11 @@
     "type": "relation"
   },
   {
+    "name": "No.",
+    "id": "YlHY",
+    "type": "formula"
+  },
+  {
     "name": "ID",
     "id": "D%40%3E%3B",
     "type": "unique_id"
