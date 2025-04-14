@@ -30,14 +30,14 @@ main();
 /**
  * Main function that orchestrates the entire process of fetching Notion data,
  * processing it, and optionally committing it to GitHub or posting to an import API.
- * 
+ *
  * Command line arguments:
  * - outputPath: Specify the output directory for generated files (default: from env or DEFAULT_OUTPUT_PATH)
  * - useLocalData: Use locally cached data instead of fetching from Notion
  * - skipImportApi: Skip posting the generated tree to the import API
  * - skipGithubSnapshot: Skip committing the generated tree to GitHub
  * - help: Display help message
- * 
+ *
  * Environment variables:
  * - API_KEY: Notion API key
  * - IMPORT_API_URL: URL for the import API
@@ -98,7 +98,7 @@ async function main() {
   if (!skipGithubSnapshot) {
     if (!githubToken) {
       console.warn(
-        "GITHUB_TOKEN is not set, skipping snapshot commit to Github"
+        "GITHUB_TOKEN is not set, skipping snapshot commit to Github",
       );
     } else {
       await commitSnapshotToGithub({
@@ -112,12 +112,12 @@ async function main() {
   if (!skipImportApi) {
     if (!importApiKey) {
       console.warn(
-        "WARNING: IMPORT_API_KEY is not set, skipping import API post"
+        "WARNING: IMPORT_API_KEY is not set, skipping import API post",
       );
     }
     if (!importApiUrl) {
       console.warn(
-        "WARNING: IMPORT_API_URL is not set, skipping import API post"
+        "WARNING: IMPORT_API_URL is not set, skipping import API post",
       );
     }
     if (importApiKey && importApiUrl) {
@@ -128,7 +128,7 @@ async function main() {
 
 /**
  * Fetches and processes Notion data to create a structured tree representation.
- * 
+ *
  * @param outputPath - Directory where output files will be stored
  * @param notionApiKey - Notion API key for fetching data (optional if useLocalData is true)
  * @param useLocalData - Whether to use locally cached data instead of fetching from Notion
@@ -143,7 +143,7 @@ async function makeAtlasData(args: {
 
   if (!notionApiKey && !useLocalData) {
     console.warn(
-      "  WARNING: Notion API_KEY env variable is not set, attempting to use data from local files."
+      "  WARNING: Notion API_KEY env variable is not set, attempting to use data from local files.",
     );
   }
 
@@ -161,7 +161,7 @@ async function makeAtlasData(args: {
   if (useLocalData || !notionApiKey) {
     if (!fs.existsSync(notionPagesOutputPath)) {
       console.error(
-        "Error: --useLocalData option requires existing local data, but the notion-pages directory is missing"
+        "Error: --useLocalData option requires existing local data, but the notion-pages directory is missing",
       );
       process.exit(1);
     }
@@ -187,11 +187,11 @@ async function makeAtlasData(args: {
 
     if (missingFiles.length > 0) {
       console.error(
-        "Error: --useLocalData option requires existing local data, but the following files/directories are missing:"
+        "Error: --useLocalData option requires existing local data, but the following files/directories are missing:",
       );
       missingFiles.forEach((item) => console.error(`  - ${item}`));
       console.error(
-        "\nPlease run the script without --useLocalData first to fetch data from Notion."
+        "\nPlease run the script without --useLocalData first to fetch data from Notion.",
       );
       process.exit(1);
     }
@@ -225,18 +225,18 @@ async function makeAtlasData(args: {
   if (!useLocalData) {
     await writeJsonToFile(
       `${notionPagesOutputPath}/${MASTER_STATUS}.json`,
-      masterStatusNotionPage
+      masterStatusNotionPage,
     );
 
     await writeJsonToFile(
       `${notionPagesOutputPath}/${HUB}.json`,
-      hubNotionPage
+      hubNotionPage,
     );
 
     for (const pageName of atlasPageNames) {
       await writeJsonToFile(
         `${notionPagesOutputPath}/${pageName}.json`,
-        fetchAtlasNotionPagesResult[pageName]
+        fetchAtlasNotionPagesResult[pageName],
       );
     }
   }
@@ -249,7 +249,7 @@ async function makeAtlasData(args: {
 
   await writeJsonToFile(
     `${processedOutputPath}/${MASTER_STATUS}.json`,
-    processedMasterStatusById
+    processedMasterStatusById,
   );
 
   const processedHubById = await processNotionPage<TProcessedHubById>({
@@ -260,13 +260,13 @@ async function makeAtlasData(args: {
   await writeJsonToFile(`${processedOutputPath}/${HUB}.json`, processedHubById);
 
   const processedAtlasPagesByIdByPageName = await processAtlasNotionPages(
-    fetchAtlasNotionPagesResult
+    fetchAtlasNotionPagesResult,
   );
 
   for (const pageName of atlasPageNames) {
     await writeJsonToFile(
       `${processedOutputPath}/${pageName}.json`,
-      processedAtlasPagesByIdByPageName[pageName]
+      processedAtlasPagesByIdByPageName[pageName],
     );
   }
 
@@ -279,13 +279,13 @@ async function makeAtlasData(args: {
 
   await writeJsonToFile(
     `${parsedOutputPath}/${MASTER_STATUS}.json`,
-    masterStatusNameStrings
+    masterStatusNameStrings,
   );
 
   const { section, agent } = processedAtlasPagesByIdByPageName;
   const sectionWithAgents = handleAgents(
     section as TProcessedSectionsById,
-    agent as TProcessedSectionsById
+    agent as TProcessedSectionsById,
   );
   processedAtlasPagesByIdByPageName.section = sectionWithAgents;
 
@@ -299,7 +299,7 @@ async function makeAtlasData(args: {
 
   await writeJsonToFile(
     `${parsedOutputPath}/notion-data-by-id.json`,
-    notionDataById
+    notionDataById,
   );
 
   const {
@@ -319,7 +319,7 @@ async function makeAtlasData(args: {
   await writeTxtToFile(`${outputPath}/view-node-counts.txt`, nodeCountsText);
   await writeTxtToFile(
     `${outputPath}/simplified-atlas-tree.txt`,
-    simplifiedViewNodeTreeTxt
+    simplifiedViewNodeTreeTxt,
   );
   // for legacy use
   await writeJsonToFile(`${outputPath}/view-node-tree.json`, viewNodeTree);
@@ -335,7 +335,7 @@ async function makeAtlasData(args: {
 
 /**
  * Commits the generated tree structure to GitHub as a snapshot.
- * 
+ *
  * @param githubToken - GitHub token for authentication
  * @param viewNodeTree - The generated tree structure to commit
  * @param simplifiedViewNodeTreeTxt - Text representation of the simplified tree
@@ -425,7 +425,7 @@ async function commitSnapshotToGithub(args: {
 
 /**
  * Posts the generated tree structure to an import API.
- * 
+ *
  * @param importApiKey - API key for authentication with the import API
  * @param importApiUrl - URL of the import API endpoint
  * @param viewNodeMap - Map of nodes in the tree to post to the API

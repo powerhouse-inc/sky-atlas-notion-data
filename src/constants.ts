@@ -2,6 +2,12 @@ import { type QueryDatabaseParameters } from "@notionhq/client/build/src/api-end
 import { type PageName } from "./types/processed-data.js";
 
 export const DEFAULT_OUTPUT_PATH = "data";
+export const DEFAULT_JSON_ENDPOINT_URL =
+  "https://sky-atlas.powerhouse.io/api/view-node-tree";
+export const DEFAULT_TXT_ENDPOINT_URL =
+  "https://sky-atlas.powerhouse.io/api/view-node-tree";
+export const DEFAULT_HTML_ENDPOINT_URL =
+  "https://sky-atlas.powerhouse.io/api/view-node-tree";
 
 export const MASTER_STATUS = "masterStatus";
 export const ORIGINAL_CONTEXT_DATA = "originalContextData";

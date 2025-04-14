@@ -9,5 +9,8 @@ namespace NodeJS {
     USE_LOCAL_DATA?: string;
     SKIP_IMPORT_API?: string;
     SKIP_GITHUB_SNAPSHOT?: string;
+    JSON_ENDPOINT_URL?: string;
+    TXT_ENDPOINT_URL?: string;
+    HTML_ENDPOINT_URL?: string;
   }
 }

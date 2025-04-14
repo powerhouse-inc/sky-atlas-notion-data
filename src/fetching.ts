@@ -32,7 +32,10 @@ export async function getNotionPage(args: {
     throw new Error("notionApiKey is required when useLocalData is false");
   }
 
-  const notion = useLocalData && !!notionApiKey ? undefined : new Client({ auth: notionApiKey });
+  const notion =
+    useLocalData && !!notionApiKey
+      ? undefined
+      : new Client({ auth: notionApiKey });
 
   const notionPagesDirPath = `${outputPath}/notion-pages`;
   const pagesDirPath = `${outputPath}/pages`;
@@ -46,7 +49,7 @@ export async function getNotionPage(args: {
   }
 
   const notionPagePath = `${notionPagesDirPath}/${pageName}.json`;
-  const fetchFromLocalFile = useLocalData || !notion
+  const fetchFromLocalFile = useLocalData || !notion;
 
   const page = fetchFromLocalFile
     ? await fetchPageFromLocalFile(notionPagePath)
@@ -61,7 +64,9 @@ export async function getNotionPage(args: {
   return page;
 }
 
-export async function processNotionPage<T extends ProcessedPagesById = ProcessedPagesById>({
+export async function processNotionPage<
+  T extends ProcessedPagesById = ProcessedPagesById,
+>({
   page,
   pageName,
 }: {
@@ -79,7 +84,7 @@ export async function processNotionPage<T extends ProcessedPagesById = Processed
 export async function fetchPageFromNotionDatabase(
   notion: Client,
   pageName: PageName,
-  noFilter: boolean
+  noFilter: boolean,
 ): Promise<NotionDatabaseQueryResponse[]> {
   const databaseId = pageIds[pageName];
   const pagePropertyIds = propertyIds[pageName];
@@ -116,7 +121,7 @@ export async function fetchPageFromNotionDatabase(
           const fetchedPageProperties = await handlePaginatedRelations(
             notion,
             page.id,
-            property.id
+            property.id,
           );
 
           property.relation = fetchedPageProperties;
@@ -168,7 +173,7 @@ export async function fetchAtlasNotionPages(args: {
 }
 
 export async function processAtlasNotionPages(
-  atlasNotionPages: FetchAtlasNotionPagesResult
+  atlasNotionPages: FetchAtlasNotionPagesResult,
 ): Promise<ProcessedAtlasPagesByIdByPageName> {
   const atlasPages = {} as ProcessedAtlasPagesByIdByPageName;
 
@@ -188,7 +193,7 @@ export async function processAtlasNotionPages(
 export async function handlePaginatedRelations(
   notion: Client,
   pageId: string,
-  propertyId: string
+  propertyId: string,
 ) {
   let cursor: string | undefined = undefined;
   const fetchedRelationIds: { id: string }[] = [];

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { literal, string, union, z } from "zod";
 import {
   ACTIVE_DATA,
   ACTIVE_DATA_CONTROLLER,
@@ -376,3 +376,11 @@ export type FetchAndProcessNotionPagesResult = {
   };
 };
 export type NotionDataById = Record<string, Item>;
+
+export const EndpointDataTypeSchema = union([
+  literal("json"),
+  literal("html"),
+]);
+export type TEndpointDataType = z.infer<typeof EndpointDataTypeSchema>;
+export const EndpointUrlSchema = string().url();
+export type TEndpointUrl = z.infer<typeof EndpointUrlSchema>;

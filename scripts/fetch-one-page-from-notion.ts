@@ -34,12 +34,8 @@ async function main() {
     noFilter = false,
   } = values;
 
-  const notion = new Client({
-    auth: process.env.API_KEY,
-  });
-
   const notionPage = await getNotionPage({
-    notion,
+    notionApiKey: process.env.API_KEY,
     pageName: pageName as PageName,
     outputPath,
     useLocalData,
@@ -54,7 +50,6 @@ async function main() {
   const processedPage = await processNotionPage({
     page: notionPage,
     pageName: pageName as PageName,
-    outputPath,
   });
 
   await writeJsonToFile(

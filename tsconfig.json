@@ -14,7 +14,8 @@
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "lib": ["esnext"]
+    "lib": ["esnext"],
+    "jsx": "react-jsx",
   },
   "include": ["**/*"],
   "exclude": ["dist", "node_modules", "output", "eslint.config.js"]

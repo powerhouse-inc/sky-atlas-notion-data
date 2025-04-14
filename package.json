@@ -20,7 +20,7 @@
     "make-atlas-data-dev": "bun run make-atlas-data --useLocalData --skipImportApi --skipGithubSnapshot",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "build": "tsc && bun run format",
+    "build": "tsc",
     "prepublishOnly": "bun run build"
   },
   "devDependencies": {
@@ -34,11 +34,15 @@
   "dependencies": {
     "@notionhq/client": "^2.3.0",
     "@types/diff": "^7.0.2",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.2",
     "change-case": "^5.4.4",
     "diff": "^7.0.0",
     "dotenv": "^16.4.7",
     "dotenv-expand": "^12.0.1",
     "octokit": "^4.1.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "zod": "^3.23.8"
   }
 }

@@ -60,7 +60,8 @@ export function buildAtlasDataFromNotionData(notionDataById: NotionDataById) {
   const rawViewNodeMap = buildViewNodeTree(notionDataById);
   const viewNodeMap = addLinkedContentToViewNodes(rawViewNodeMap, slugLookup);
   const viewNodeTree = makeViewNodeTreeFromViewNodeMap(viewNodeMap);
-  const simplifiedViewNodeTreeTxt = makeSimplifiedAtlasData(viewNodeMap).join("\n");
+  const simplifiedViewNodeTreeTxt =
+    makeSimplifiedAtlasData(viewNodeMap).join("\n");
   const nodeCountsText = printNodeCounts();
 
   return {
