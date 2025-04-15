@@ -1,7 +1,7 @@
 {
   "name": "@powerhousedao/sky-atlas-notion-data",
   "description": "Fetches and processes Sky Atlas data from Notion",
-  "version": "1.1.1-alpha.0",
+  "version": "1.1.1-alpha.5",
   "author": "Powerhouse DAO",
   "license": "AGPL-3.0",
   "type": "module",
@@ -13,11 +13,12 @@
   ],
   "bin": {
     "make-atlas-data": "./dist/scripts/make-atlas-data.js",
-    "make-atlas-data-dev": "./dist/scripts/make-atlas-data.js --useLocalData --skipImportApi --skipGithubSnapshot"
+    "fetch-latest-atlas-data": "./dist/scripts/fetch-latest-atlas-data.js"
   },
   "scripts": {
     "make-atlas-data": "bun run ./scripts/make-atlas-data.ts",
     "make-atlas-data-dev": "bun run make-atlas-data --useLocalData --skipImportApi --skipGithubSnapshot",
+    "fetch-latest-atlas-data": "bun run ./scripts/fetch-latest-atlas-data.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "build": "tsc",

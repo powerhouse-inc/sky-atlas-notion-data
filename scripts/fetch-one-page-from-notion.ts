@@ -1,4 +1,4 @@
-import { Client } from "@notionhq/client";
+// #!/usr/bin/env node
 import { handleEnv } from "./handleEnv.js";
 import { parseArgs } from "util";
 import { getNotionPage, processNotionPage } from "../src/fetching.js";
@@ -7,6 +7,7 @@ import { writeJsonToFile } from "./utils.js";
 
 handleEnv();
 main();
+
 async function main() {
   const { values } = parseArgs({
     args: process.argv.slice(2),

@@ -11,6 +11,7 @@ import {
   type ParagraphsViewNodeContent,
 } from "../types/view-nodes.js";
 import { makeViewNodeAtlasId } from "../utils/processing.js";
+import { DEFAULT_ATLAS_DATA_URL } from "../constants.js";
 
 export function NodeContent(props: { node: ViewNode }) {
   const { node } = props;
@@ -75,7 +76,9 @@ function LinkNodeContent(props: { content: LinkViewNodeContent }) {
     );
   }
 
-  return <a href={href}>{text}</a>;
+  const atlasDataUrl = process.env.ATLAS_DATA_URL ?? DEFAULT_ATLAS_DATA_URL;
+
+  return <a href={`${atlasDataUrl}${href}`}>{text}</a>;
 }
 
 function MentionNodeContent(props: { content: MentionViewNodeContent }) {
@@ -83,7 +86,9 @@ function MentionNodeContent(props: { content: MentionViewNodeContent }) {
     content: { text, href },
   } = props;
 
-  return <a href={href}>{text}</a>;
+  const atlasDataUrl = process.env.ATLAS_DATA_URL ?? DEFAULT_ATLAS_DATA_URL;
+
+  return <a href={`${atlasDataUrl}${href}`}>{text}</a>;
 }
 
 function EquationNodeContent(props: { content: EquationViewNodeContent }) {

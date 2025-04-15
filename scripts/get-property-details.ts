@@ -1,9 +1,12 @@
+// #!/usr/bin/env node
 import {
   apiKey, pageIds
 } from "../src/constants.js";
 import { Client } from "@notionhq/client";
 import { parseArgs } from "util";
+import { handleEnv } from "./handleEnv.js";
 
+handleEnv();
 main();
 
 async function main() {

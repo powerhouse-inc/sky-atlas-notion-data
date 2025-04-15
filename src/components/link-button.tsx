@@ -1,3 +1,4 @@
+import { DEFAULT_ATLAS_DATA_URL } from "../constants.js";
 import { type ViewNode } from "../types/view-nodes.js";
 import { makeViewNodeUrl } from "../utils/processing.js";
 
@@ -8,9 +9,10 @@ interface Props {
 export function LinkButton(props: Props) {
   const { node, className } = props;
   const nodeUrl = makeViewNodeUrl(node);
+  const atlasDataUrl = process.env.ATLAS_DATA_URL ?? DEFAULT_ATLAS_DATA_URL;
 
   return (
-      <a href={nodeUrl}>
+      <a href={`${atlasDataUrl}${nodeUrl}`}>
         <svg
           viewBox="0 0 15 15"
           width={15}

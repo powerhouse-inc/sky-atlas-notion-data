@@ -1,3 +1,4 @@
+// #!/usr/bin/env node
 import {
   type ViewNodeMap,
   type ViewNode,
