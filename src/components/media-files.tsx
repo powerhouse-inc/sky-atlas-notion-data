@@ -11,10 +11,7 @@ export function MediaFiles(props: Props) {
       <h3>Files & media</h3>
       {files.map((file, index) => (
         <div key={index}>
-          <img
-            src={file.url}
-            alt="Attached image"
-          />
+          <a href={file.url} target="_blank" rel="noopener noreferrer"></a>
         </div>
       ))}
     </div>

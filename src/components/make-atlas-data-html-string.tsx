@@ -5,6 +5,9 @@ import { Scope } from "./scope.js";
 import { SubDocument } from "./sub-document.js";
 import { format } from "prettier";
 
+/**
+ * Prettier formatting options for HTML output
+ */
 const prettierOptions = {
   parser: "html",
   htmlWhitespaceSensitivity: "ignore",
@@ -12,7 +15,13 @@ const prettierOptions = {
   printWidth: 100,
 } as const;
 
-export async function makeAtlasDataHtmlDocument(viewNodeTree: ViewNodeTree, formatOptions = prettierOptions) {
+/**
+ * Creates a complete HTML document from a view node tree
+ * @param {ViewNodeTree} viewNodeTree - The tree of view nodes to convert to HTML
+ * @param {Object} [formatOptions=prettierOptions] - Prettier formatting options
+ * @returns {Promise<string>} A formatted HTML document string
+ */
+export async function makeAtlasDataHtmlDocument(viewNodeTree: ViewNodeTree, formatOptions: object = prettierOptions): Promise<string> {
   const htmlString = await makeAtlasDataHtmlString(viewNodeTree, formatOptions);
   const document = `<!DOCTYPE html>
 <html>
@@ -77,12 +86,23 @@ export async function makeAtlasDataHtmlDocument(viewNodeTree: ViewNodeTree, form
   return formatted;
 }
 
-export async function makeAtlasDataHtmlString(viewNodeTree: ViewNodeTree, formatOptions = prettierOptions) {
+/**
+ * Converts a view node tree to an HTML string
+ * @param {ViewNodeTree} viewNodeTree - The tree of view nodes to convert to HTML
+ * @param {Object} [formatOptions=prettierOptions] - Prettier formatting options
+ * @returns {Promise<string>} A formatted HTML string
+ */
+export async function makeAtlasDataHtmlString(viewNodeTree: ViewNodeTree, formatOptions: object = prettierOptions): Promise<string> {
   const htmlString = viewNodeTree.map((viewNode) => renderViewNodeToHtmlString(viewNode)).join("");
   const formatted = await format(htmlString, formatOptions);
   return formatted;
 }
 
+/**
+ * Renders a single view node to an HTML string
+ * @param {ViewNode} viewNode - The view node to render
+ * @returns {string} The rendered HTML string
+ */
 export function renderViewNodeToHtmlString(viewNode: ViewNode) {
   if (viewNode.type === "scope") {
     return renderToString(<Scope node={viewNode} />);

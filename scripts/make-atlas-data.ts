@@ -46,6 +46,7 @@ main();
  * - IMPORT_API_KEY: API key for the import API
  * - GITHUB_TOKEN: GitHub token for committing snapshots
  * - OUTPUT_PATH: Output directory for generated files
+ * - ATLAS_DATA_URL: URL for the processed Atlas data, used in generated HTML link tags
  * - USE_LOCAL_DATA: Set to "true" to use data from local files
  * - SKIP_IMPORT_API: Set to "true" to skip posting to import API
  * - SKIP_GITHUB_SNAPSHOT: Set to "true" to skip committing snapshots to GitHub

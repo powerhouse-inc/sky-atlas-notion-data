@@ -7,6 +7,14 @@ import {
   getSupportDocs,
 } from "../src/index.js";
 
+/**
+ * Make simplified Atlas data
+ * 
+ * This function takes a tree map of view nodes and returns a list of strings
+ * representing the simplified Atlas data.
+ * 
+ * This simplified data is useful for the Github snapshots of the Atlas data, because it is easier to see the changes than when looking at the JSON data.
+ */
 export function makeSimplifiedAtlasData(treeMap: ViewNodeMap): string[] {
   const scopes = Object.values(treeMap).filter(
     (node) => node?.type === "scope",

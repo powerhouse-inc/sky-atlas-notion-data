@@ -3,6 +3,12 @@ import dotenv from "dotenv";
 import dotenvExpand from "dotenv-expand";
 import { existsSync } from "node:fs";
 
+/**
+ * Handle environment variables
+ * 
+ * This function sets the NODE_ENV to 'development' if it is not set.
+ * It then loads the environment variables from the appropriate files based on the NODE_ENV.
+ */
 export function handleEnv() {
   // Default NODE_ENV to 'development' if not set
   process.env.NODE_ENV ||= "development";

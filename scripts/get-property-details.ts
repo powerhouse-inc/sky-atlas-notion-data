@@ -9,6 +9,9 @@ import { handleEnv } from "./handleEnv.js";
 handleEnv();
 main();
 
+/** 
+ * Get the type and ID of a given property of a given page in Notion
+ */
 async function main() {
   const args = parseArgs({
     options: {

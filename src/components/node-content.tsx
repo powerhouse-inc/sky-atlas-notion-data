@@ -30,6 +30,12 @@ export function NodeContent(props: { node: ViewNode }) {
   ));
 }
 
+/**
+ * Component for rendering individual content items within a node
+ * @param {Object} props - Component props
+ * @param {TProcessedViewNodeContent} props.content - The content item to render
+ * @returns {JSX.Element} Rendered content item
+ */
 function NodeContentItem(props: { content: TProcessedViewNodeContent }) {
   const { content } = props;
 
@@ -49,6 +55,12 @@ function NodeContentItem(props: { content: TProcessedViewNodeContent }) {
   }
 }
 
+/**
+ * Component for rendering link content
+ * @param {Object} props - Component props
+ * @param {LinkViewNodeContent} props.content - The link content to render
+ * @returns {JSX.Element} Rendered link element
+ */
 function LinkNodeContent(props: { content: LinkViewNodeContent }) {
   const {
     content: { text, href, external },
@@ -81,6 +93,12 @@ function LinkNodeContent(props: { content: LinkViewNodeContent }) {
   return <a href={`${atlasDataUrl}${href}`}>{text}</a>;
 }
 
+/**
+ * Component for rendering mention content
+ * @param {Object} props - Component props
+ * @param {MentionViewNodeContent} props.content - The mention content to render
+ * @returns {JSX.Element} Rendered mention element
+ */
 function MentionNodeContent(props: { content: MentionViewNodeContent }) {
   const {
     content: { text, href },
@@ -91,6 +109,12 @@ function MentionNodeContent(props: { content: MentionViewNodeContent }) {
   return <a href={`${atlasDataUrl}${href}`}>{text}</a>;
 }
 
+/**
+ * Component for rendering equation content
+ * @param {Object} props - Component props
+ * @param {EquationViewNodeContent} props.content - The equation content to render
+ * @returns {JSX.Element} Rendered equation element
+ */
 function EquationNodeContent(props: { content: EquationViewNodeContent }) {
   const {
     content: { text },
@@ -99,6 +123,12 @@ function EquationNodeContent(props: { content: EquationViewNodeContent }) {
   return <pre>{text}</pre>;
 }
 
+/**
+ * Component for rendering code content
+ * @param {Object} props - Component props
+ * @param {CodeViewNodeContent} props.content - The code content to render
+ * @returns {JSX.Element} Rendered code element
+ */
 function CodeNodeContent(props: { content: CodeViewNodeContent }) {
   const {
     content: { text },
@@ -107,6 +137,12 @@ function CodeNodeContent(props: { content: CodeViewNodeContent }) {
   return <code>{text}</code>;
 }
 
+/**
+ * Component for rendering table content
+ * @param {Object} props - Component props
+ * @param {TableViewNodeContent} props.content - The table content to render
+ * @returns {JSX.Element} Rendered table element
+ */
 function TableNodeContent(props: { content: TableViewNodeContent }) {
   const {
     content: { text },
@@ -119,6 +155,12 @@ function TableNodeContent(props: { content: TableViewNodeContent }) {
   );
 }
 
+/**
+ * Component for rendering paragraphs content
+ * @param {Object} props - Component props
+ * @param {ParagraphsViewNodeContent} props.content - The paragraphs content to render
+ * @returns {JSX.Element} Rendered paragraphs element
+ */
 function ParagraphsNodeContent(props: { content: ParagraphsViewNodeContent }) {
   const {
     content: { text },

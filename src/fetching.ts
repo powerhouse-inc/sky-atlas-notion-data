@@ -19,6 +19,10 @@ import {
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 
+/**
+ * Fetches a single Notion page either from the API or local cache
+ * Handles both online and offline modes with local data fallback
+ */
 export async function getNotionPage(args: {
   notionApiKey: string | undefined;
   outputPath: string;
@@ -64,6 +68,10 @@ export async function getNotionPage(args: {
   return page;
 }
 
+/**
+ * Processes a Notion page using the appropriate processor
+ * Applies the page-specific transformation logic to convert raw Notion data
+ */
 export async function processNotionPage<
   T extends ProcessedPagesById = ProcessedPagesById,
 >({
@@ -81,6 +89,10 @@ export async function processNotionPage<
   return processed as T;
 }
 
+/**
+ * Fetches all pages from a Notion database
+ * Handles pagination and relation fetching for complete data retrieval
+ */
 export async function fetchPageFromNotionDatabase(
   notion: Client,
   pageName: PageName,
@@ -133,6 +145,10 @@ export async function fetchPageFromNotionDatabase(
   return pages;
 }
 
+/**
+ * Fetches a page from local cache
+ * Used when working offline or with cached data
+ */
 async function fetchPageFromLocalFile(notionPagePath: string) {
   if (!existsSync(notionPagePath)) {
     throw new Error(`Notion page not found: ${notionPagePath}\n\n`);
@@ -145,6 +161,11 @@ async function fetchPageFromLocalFile(notionPagePath: string) {
 
   return pages;
 }
+
+/**
+ * Fetches all Atlas pages from Notion
+ * Can use local data or Notion API, but local data must be present
+ */
 export async function fetchAtlasNotionPages(args: {
   notionApiKey: string | undefined;
   outputPath: string;
@@ -172,6 +193,10 @@ export async function fetchAtlasNotionPages(args: {
   return atlasNotionPages;
 }
 
+/**
+ * Processes all Atlas pages using their respective processors
+ * Converts raw Notion data into our processed format
+ */
 export async function processAtlasNotionPages(
   atlasNotionPages: FetchAtlasNotionPagesResult,
 ): Promise<ProcessedAtlasPagesByIdByPageName> {
@@ -190,6 +215,10 @@ export async function processAtlasNotionPages(
   return atlasPages;
 }
 
+/**
+ * Handles paginated relation fetching from Notion
+ * Ensures all related pages are retrieved even when they span multiple pages
+ */
 export async function handlePaginatedRelations(
   notion: Client,
   pageId: string,

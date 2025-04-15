@@ -27,12 +27,22 @@ import {
 import { agentArtifactsSectionId } from "../constants.js";
 import { makeAtlasDataHtmlDocument } from "../components/make-atlas-data-html-string.js";
 
+/**
+ * Extracts text content from a title field
+ * @param {TTitleField} titleField - The title field to process
+ * @returns {TProcessedRichText} Filtered array of rich text items
+ */
 export function getTextFromTitle(titleField: TTitleField): TProcessedRichText {
   const title = titleField?.title ?? [];
 
   return title.filter((item) => item !== null && item !== undefined);
 }
 
+/**
+ * Extracts content from a rich text field
+ * @param {TRichTextField} richTextField - The rich text field to process
+ * @returns {TProcessedRichText} Filtered array of rich text items
+ */
 export function getContentFromRichText(
   richTextField: TRichTextField,
 ): TProcessedRichText {
@@ -40,6 +50,11 @@ export function getContentFromRichText(
   return richText.filter((item) => item !== null && item !== undefined);
 }
 
+/**
+ * Converts an array of rich text items into a single string
+ * @param {TProcessedRichText} richText - Array of rich text items
+ * @returns {string} Concatenated plain text
+ */
 export function makeProcessedRichTextString(richText: TProcessedRichText) {
   return richText
     .map((item) => item.plain_text)
@@ -47,6 +62,11 @@ export function makeProcessedRichTextString(richText: TProcessedRichText) {
     .trim();
 }
 
+/**
+ * Processes file objects into a simplified format
+ * @param {TFiles} files - Files to process
+ * @returns {TProcessedFile[]} Array of processed files
+ */
 export function getProcessedFiles(files: TFiles): TProcessedFile[] {
   if (!files?.files) return [];
 
@@ -71,6 +91,11 @@ export function getProcessedFiles(files: TFiles): TProcessedFile[] {
     .filter((file) => file !== null && file !== undefined);
 }
 
+/**
+ * Extracts relations from a relation field
+ * @param {TRelation} relation - The relation field to process
+ * @returns {TProcessedRelations} Array of processed relations
+ */
 export function getRelations(relation: TRelation) {
   if (!relation) return [];
 
@@ -83,14 +108,32 @@ export function getRelations(relation: TRelation) {
   return (result.data?.filter((r) => Boolean(r?.id)) ??
     []) as TProcessedRelations;
 }
+
+/**
+ * Extracts text from a select field
+ * @param {TSelect} select - The select field to process
+ * @returns {string} The selected value's name
+ */
 export function getTextFromSelect(select: TSelect) {
   return select?.select?.name ?? "";
 }
 
+/**
+ * Creates a Zod schema for a record of items by ID
+ * @template TSchema - The schema type
+ * @param {TSchema} schema - The base schema to use
+ * @returns {z.ZodType} A record schema
+ */
 export function makeSchemaById<TSchema extends z.ZodTypeAny>(schema: TSchema) {
   return z.record(z.string(), schema);
 }
 
+/**
+ * Gets status names from status IDs using a lookup table
+ * @param {string[]} masterStatusIds - Array of status IDs
+ * @param {Record<string, string>} parsedMasterStatus - Lookup table of status IDs to names
+ * @returns {string[]} Array of status names
+ */
 export function getMasterStatusNames(
   masterStatusIds: string[],
   parsedMasterStatus: Record<string, string>,
@@ -98,11 +141,21 @@ export function getMasterStatusNames(
   return masterStatusIds.map((id) => parsedMasterStatus[id]);
 }
 
+/**
+ * Extracts IDs from an array of relations
+ * @param {any[]} relations - Array of relations
+ * @returns {string[]} Array of IDs
+ */
 export function getIds(relations: any[]): string[] {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   return relations?.map((r) => r?.id) ?? [];
 }
 
+/**
+ * Creates HTML documents for each node in the view node map
+ * @param {ViewNodeMap} viewNodeMap - Map of view nodes
+ * @returns {Promise<Record<string, string>>} Map of node IDs to HTML strings
+ */
 export async function makeHtmlDocumentViewNodeMap(viewNodeMap:  ViewNodeMap) {
   const htmlStringViewNodeMap: Record<string, string> = {};
   for (const slugSuffix in viewNodeMap) {
@@ -111,6 +164,14 @@ export async function makeHtmlDocumentViewNodeMap(viewNodeMap:  ViewNodeMap) {
   }
   return htmlStringViewNodeMap;
 }
+
+/**
+ * Processes a raw view node map into a processed view node map
+ * @param {RawViewNodeMap} rawViewNodeMap - Raw view node map to process
+ * @param {Record<string, string>} slugLookup - Lookup table for slugs
+ * @param {ViewNodeMap} [viewNodeMap={}] - Optional existing view node map to update
+ * @returns {ViewNodeMap} Processed view node map
+ */
 export function processRawViewNodeMap(
   rawViewNodeMap: RawViewNodeMap,
   slugLookup: Record<string, string>,
@@ -125,6 +186,14 @@ export function processRawViewNodeMap(
   return viewNodeMap;
 }
 
+/**
+ * Processes a raw view node into a processed view node
+ * @param {RawViewNode} node - Raw view node to process
+ * @param {Record<string, string>} slugLookup - Lookup table for slugs
+ * @param {RawViewNodeMap} rawViewNodeMap - Raw view node map
+ * @param {ViewNodeMap} viewNodeMap - View node map to update
+ * @returns {ViewNode} Processed view node
+ */
 function processRawViewNode(
   node: RawViewNode,
   slugLookup: Record<string, string>,
@@ -160,6 +229,25 @@ function processRawViewNode(
   return viewNode;
 }
 
+/**
+ * Processes content for a view node, including handling links and mentions
+ * 
+ * This function processes the raw content of a view node, with special handling for:
+ * - Links to other nodes (both internal and external)
+ * - Mentions of other nodes
+ * - Equations, code blocks, and tables
+ * - Regular paragraphs
+ * 
+ * For links and mentions, it:
+ * 1. Extracts the target node ID from the URL or mention
+ * 2. Looks up the target node in the view node map
+ * 3. Creates a processed link/mention with the correct numbering and title
+ * 
+ * @param {RawViewNode} node - Node to process content for
+ * @param {RawViewNodeMap} rawViewNodeMap - Raw view node map
+ * @param {Record<string, string>} slugLookup - Lookup table for slugs
+ * @returns {TProcessedNodeContentItem[]} Processed content items
+ */
 function processContentForViewNode(
   node: RawViewNode,
   rawViewNodeMap: RawViewNodeMap,
@@ -201,6 +289,27 @@ function processContentForViewNode(
     .filter((item) => item !== null && item !== undefined);
 }
 
+/**
+ * Creates a processed content item from a rich text item
+ * 
+ * This function handles the conversion of raw rich text items into processed content,
+ * with special handling for different content types:
+ * 
+ * - Mentions: Converts Notion mentions to links with correct numbering
+ * - Links: Processes both internal and external links
+ * - Equations: Preserves equation content
+ * - Code: Preserves code content with formatting
+ * - Tables: Preserves table content
+ * - Paragraphs: Handles regular text content
+ * 
+ * For links and mentions, it ensures the correct numbering is used by looking up
+ * the target node in the view node map and using its processed title.
+ * 
+ * @param {TProcessedRichTextItem} richTextItem - Rich text item to process
+ * @param {RawViewNodeMap} viewNodeMap - View node map for looking up target nodes
+ * @param {Record<string, string>} slugLookup - Lookup table for slugs
+ * @returns {TProcessedViewNodeContent | null} Processed content item or null
+ */
 function makeProcessedContentItem(
   richTextItem: TProcessedRichTextItem,
   viewNodeMap: RawViewNodeMap,
@@ -255,6 +364,11 @@ function makeProcessedContentItem(
   return null;
 }
 
+/**
+ * Creates a paragraphs content item
+ * @param {string} text - Text content
+ * @returns {TProcessedViewNodeContent} Paragraphs content item
+ */
 function makeParagraphsContent(text: string) {
   return {
     type: "paragraphs",
@@ -262,6 +376,11 @@ function makeParagraphsContent(text: string) {
   } as const;
 }
 
+/**
+ * Creates a code content item
+ * @param {string} text - Code content
+ * @returns {TProcessedViewNodeContent} Code content item
+ */
 function makeCodeContent(text: string) {
   return {
     type: "code",
@@ -269,6 +388,11 @@ function makeCodeContent(text: string) {
   } as const;
 }
 
+/**
+ * Creates a table content item
+ * @param {string} text - Table content
+ * @returns {TProcessedViewNodeContent} Table content item
+ */
 function makeTableContent(text: string) {
   return {
     type: "table",
@@ -276,6 +400,11 @@ function makeTableContent(text: string) {
   } as const;
 }
 
+/**
+ * Creates an equation content item
+ * @param {string} text - Equation content
+ * @returns {TProcessedViewNodeContent} Equation content item
+ */
 function makeEquationContent(text: string) {
   return {
     type: "equation",
@@ -283,6 +412,24 @@ function makeEquationContent(text: string) {
   } as const;
 }
 
+/**
+ * Creates a link content item
+ * 
+ * Processes a link to either:
+ * 1. An internal node (using the processed node's title and URL)
+ * 2. An external URL (preserving the original link)
+ * 
+ * For internal links, it:
+ * 1. Extracts the target node ID from the URL
+ * 2. Looks up the target node in the view node map
+ * 3. Uses the processed node's title and URL
+ * 
+ * @param {string} href - Link URL
+ * @param {string} text - Link text
+ * @param {RawViewNodeMap} viewNodeMap - View node map for looking up target nodes
+ * @param {Record<string, string>} slugLookup - Lookup table for slugs
+ * @returns {TProcessedViewNodeContent} Link content item
+ */
 function makeLinkContent(
   href: string,
   text: string,
@@ -313,6 +460,21 @@ function makeLinkContent(
   } as const;
 }
 
+/**
+ * Creates a mention content item
+ * 
+ * Processes a Notion mention to:
+ * 1. Look up the mentioned node in the view node map
+ * 2. Use the processed node's title and URL
+ * 3. Fall back to the original text and URL if the node isn't found
+ * 
+ * @param {string} id - Mentioned page ID
+ * @param {string} text - Mention text
+ * @param {string | null | undefined} url - Mention URL
+ * @param {RawViewNodeMap} viewNodeMap - View node map for looking up target nodes
+ * @param {Record<string, string>} slugLookup - Lookup table for slugs
+ * @returns {TProcessedViewNodeContent} Mention content item
+ */
 function makeMentionContent(
   id: string,
   text: string,
@@ -331,6 +493,12 @@ function makeMentionContent(
   } as const;
 }
 
+/**
+ * Gets a slug with suffix for a given ID
+ * @param {string} id - Node ID
+ * @param {Record<string, string>} slugLookup - Lookup table for slugs
+ * @returns {string} Slug with suffix
+ */
 export function getSlugWithSuffix(
   id: string,
   slugLookup: Record<string, string>,
@@ -345,15 +513,30 @@ export function getSlugWithSuffix(
   return `${id}|${slugFromLookup}`;
 }
 
+/**
+ * Creates a URL for a view node
+ * @param {ViewNode | RawViewNode} node - Node to create URL for
+ * @returns {string} Node URL
+ */
 export function makeViewNodeUrl(node: ViewNode | RawViewNode) {
   const titleSlug = makeViewNodeTitleSlug(node);
   return `/${titleSlug}/${node.slugSuffix}`;
 }
 
+/**
+ * Creates a title slug for a view node
+ * @param {ViewNode | RawViewNode} node - Node to create slug for
+ * @returns {string} Title slug
+ */
 export function makeViewNodeTitleSlug(node: ViewNode | RawViewNode) {
   return makeViewNodeTitleText(node).replaceAll(/[- _/]+/g, "_");
 }
 
+/**
+ * Creates a title text for a view node
+ * @param {ViewNode | RawViewNode} node - Node to create title for
+ * @returns {string} Title text
+ */
 export function makeViewNodeTitleText(node: ViewNode | RawViewNode): string {
   const { formalId, title, typeSuffix } = node.title;
   const { prefix, numberPath } = formalId;
@@ -363,6 +546,11 @@ export function makeViewNodeTitleText(node: ViewNode | RawViewNode): string {
   return `${path} - ${title}${typeSuffixString}`;
 }
 
+/**
+ * Extracts a Notion ID from a URL
+ * @param {string | null | undefined} url - URL to extract ID from
+ * @returns {string | null} Extracted ID or null
+ */
 export function formatNotionIdFromUrl(
   url: string | null | undefined,
 ): string | null {
@@ -383,6 +571,11 @@ export function formatNotionIdFromUrl(
   return null;
 }
 
+/**
+ * Formats a UUID string
+ * @param {string} uuid - UUID string to format
+ * @returns {string} Formatted UUID
+ */
 export function formatUUID(uuid: string): string {
   if (uuid.length !== 32) {
     throw new Error("Invalid UUID string length");
@@ -394,12 +587,22 @@ export function formatUUID(uuid: string): string {
   )}-${uuid.substring(16, 20)}-${uuid.substring(20)}`;
 }
 
+/**
+ * Creates an Atlas ID for a view node. This is the number that appears in the Atlas Explorer.
+ * @param {ViewNode} node - Node to create ID for
+ * @returns {string} Atlas ID
+ */
 export function makeViewNodeAtlasId(node: ViewNode) {
   const { formalId } = node.title;
   const { prefix, numberPath } = formalId;
   return `${prefix}.${numberPath.join(".")}`;
 }
 
+/**
+ * Checks if a document type is a section type
+ * @param {string} docType - Document type to check
+ * @returns {boolean} Whether the type is a section type
+ */
 export function isSectionDocType(docType: string): docType is TSectionDocType {
   if (SectionDocTypeSchema.safeParse(docType).success) {
     return true;
@@ -408,6 +611,12 @@ export function isSectionDocType(docType: string): docType is TSectionDocType {
   return false;
 }
 
+/**
+ * Checks if a document type is a support type
+ * @param {string} docType - Document type to check
+ * @param {TSupportDocType} docType - Document type to check
+ * @returns {boolean} Whether the type is a support type
+ */
 export function isSupportDocType(docType: string): docType is TSupportDocType {
   if (SupportDocTypeSchema.safeParse(docType).success) {
     return true;
@@ -416,14 +625,37 @@ export function isSupportDocType(docType: string): docType is TSupportDocType {
   return false;
 }
 
+/**
+ * Gets support documents from a node's subdocuments
+ * @param {ViewNode} node - Node to get support documents from
+ * @returns {ViewNode[]} Array of support documents
+ */
 export function getSupportDocs(node: ViewNode) {
   return node.subDocuments.filter((subDoc) => isSupportDocType(subDoc.type));
 }
 
+/**
+ * Gets non-support documents from a node's subdocuments
+ * @param {ViewNode} node - Node to get non-support documents from
+ * @returns {ViewNode[]} Array of non-support documents
+ */
 export function getNonSupportDocs(node: ViewNode) {
   return node.subDocuments.filter((subDoc) => !isSupportDocType(subDoc.type));
 }
 
+/**
+ * Processes agent-related sections from the agents database
+ * 
+ * The agents database contains sections that follow special naming and numbering rules.
+ * This function:
+ * 1. Identifies agent artifacts and sky primitives
+ * 2. Updates section relationships
+ * 3. Adds special flags to sections
+ * 
+ * @param {TProcessedSectionsById} processedSectionsById - Processed sections from main database
+ * @param {TProcessedSectionsById} processedAgentsById - Processed sections from agents database
+ * @returns {TProcessedSectionsById} Combined and processed sections
+ */
 export function handleAgents(
   processedSectionsById: TProcessedSectionsById,
   processedAgentsById: TProcessedSectionsById,

@@ -1,12 +1,22 @@
 import type { Item, SectionItem } from "../types/index.js";
 import { isSectionDocType } from "./processing.js";
 
+/**
+ * Sorts an array of items by their document number
+ * Handles document numbers in the format "X.Y.Z" by comparing the last number
+ * Falls back to string comparison if no numbers are found
+ */
 export function makeSortedByDocNo<
   T extends Record<string, any> & { docNo: string },
 >(arr: T[]) {
   return arr.toSorted(sortByDocNo);
 }
 
+/**
+ * Sorts an array of items by either their number or document number
+ * Items with numbers are sorted first, followed by items sorted by document number
+ * Used to allow AA to apply their own sorting logic to items
+ */
 export function makeSortedByNumberOrDocNo<
   T extends Record<string, any> & {
     docNo: string | null | undefined;
@@ -29,10 +39,18 @@ export function makeSortedByNumberOrDocNo<
   ] as T[];
 }
 
+/**
+ * Sorts an array of items by their number field
+ * Used for ordering sections that have explicit numbering
+ */
 function makeSortedByNumber(arr: Record<string, any> & { number: number }[]) {
   return arr.toSorted(sortByNumber);
 }
 
+/**
+ * Comparison function for sorting by number field
+ * Returns negative if a < b, positive if a > b, zero if equal
+ */
 function sortByNumber(
   a: Record<string, any> & {
     number: number;
@@ -44,6 +62,11 @@ function sortByNumber(
   return a.number - b.number;
 }
 
+/**
+ * Comparison function for sorting by document number
+ * Extracts the last number from the document number string for comparison
+ * Falls back to string comparison if no numbers are found
+ */
 function sortByDocNo(
   a: Record<string, any> & { docNo: string | null | undefined },
   b: Record<string, any> & { docNo: string | null | undefined },
@@ -64,27 +87,25 @@ function sortByDocNo(
   return lastNumberA - lastNumberB;
 }
 
+/**
+ * Extracts the first element from a string split by " - "
+ * Used for processing document titles and identifiers
+ */
 export function getFirstElement(s: string) {
   return s.split(" - ").at(0);
 }
 
+/**
+ * Extracts the last element from a string split by " - "
+ * Used for processing document titles and identifiers
+ */
 export function getLastElement(s: string) {
   return s.split(" - ").at(-1);
 }
 
-export function removeLastNumberSection(input: string): string {
-  // Find the last occurrence of a period followed by a number
-  const lastDotIndex = input.lastIndexOf(".");
-
-  // If a period is found, return the string up to that point
-  if (lastDotIndex !== -1) {
-    return input.substring(0, lastDotIndex);
-  }
-
-  // If no period is found, return the original string
-  return input;
-}
-
+/**
+ * Type guard to check if an item is a section item
+ */
 export function isSectionItem(item: Item): item is SectionItem {
   return isSectionDocType(item.type);
 }
