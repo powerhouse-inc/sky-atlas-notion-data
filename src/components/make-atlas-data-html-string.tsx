@@ -23,6 +23,9 @@ export async function makeAtlasDataHtmlDocument(viewNodeTree: ViewNodeTree, form
         font-family: sans-serif;
         line-height: 1.6;
         margin: 2rem;
+        margin: 0 auto;
+        padding: 1rem;
+        max-width: 1200px;
         color: #333;
         background: #fff;
       }
