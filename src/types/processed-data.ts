@@ -46,7 +46,8 @@ export type TNotionNumber = z.infer<typeof NotionNumber>;
 
 /**
  * Schema for processed rich text content
- * Similar to Notion's rich text but with additional processing for mentions and links
+ * 
+ * This takes our parsed RichText type and normalizes it into a more general format.
  */
 export const ProcessedRichText = z.array(
   z.object({
@@ -85,7 +86,7 @@ export type TProcessedRichText = z.infer<typeof ProcessedRichText>;
 export type TProcessedRichTextItem = TProcessedRichText[number];
 
 /**
- * Schema for node content, which can include headings and rich text
+ * Schema for node content, which can include headings and processed rich text
  */
 export const NodeContent = z.array(
   z.object({
@@ -98,6 +99,7 @@ export type TNodeContent = z.infer<typeof NodeContent>;
 
 /**
  * Schema for processed relations, which are simplified from Notion's format
+ * Notion relations can be nullish and can contain other weird stuff, so we normalize them to an array of objects with an `id` field
  */
 export const ProcessedRelations = z.array(z.object({ id: z.string() }));
 
@@ -125,6 +127,9 @@ export const CommonRelations = {
 
 /**
  * Schema for section document types
+ * 
+ * Section doc types are special because they can be have recursive parent-child relationships. 
+ * 
  * These are subject to special processing because their parent-child relationships are not always persisted both ways in Notion.
  * Categories also have special logic, see `makeNotionDataById` for details.
  */
@@ -179,6 +184,8 @@ export type TDocType = z.infer<typeof DocTypeSchema>;
 
 /**
  * Common properties shared across all processed documents
+ * 
+ * We create string representations of the name and docNo fields to make them easier to work with.
  */
 export const SharedSchemaProperties = {
   ...CommonRelations,
@@ -347,6 +354,8 @@ export type TProcessedOriginalContextDataById = z.infer<
 
 /**
  * Schema for processed master status
+ * 
+ * The master status is not shown in the Atlas Explorer, but it is used to determine which items in Notion should be fetched and shown.
  */
 export const ProcessedMasterStatus = z.object({
   id: z.string(),
@@ -364,6 +373,8 @@ export type TProcessedMasterStatusById = z.infer<
 
 /**
  * Schema for processed hubs
+ * 
+ * The hub is not shown in the Atlas Explorer. We use it to look up the provenance links for each page.
  */
 export const ProcessedHub = z.object({
   id: z.string(),
@@ -385,6 +396,8 @@ export type AtlasPageName = AtlasPageNames[number];
 
 /**
  * Type for reference page names
+ * 
+ * Reference pages are special because they are not displayed in the Atlas Explorer.
  */
 export type ReferencePageNames = typeof referencePageNames;
 
@@ -413,6 +426,10 @@ export type PagePropertiesList = {
 
 /**
  * Union type for all Atlas page types
+ * 
+ * This is the main type that we use to represent the data in the Atlas Explorer.
+ * 
+ * Excluding the reference pages, this is the type that is used to represent the data in the Atlas Explorer.
  */
 export type ProcessedAtlasPage =
   | TProcessedArticle
@@ -428,6 +445,8 @@ export type ProcessedAtlasPage =
 
 /**
  * Union type for all reference page types
+ * 
+ * These are special because they are not displayed in the Atlas Explorer.
  */
 export type ProcessedReferencePage = TProcessedMasterStatus | TProcessedHub;
 
@@ -472,35 +491,6 @@ export type ProcessedAtlasPagesByIdByPageName = Record<
   AtlasPageName,
   ProcessedAtlasPagesById
 >;
-
-/**
- * Type for reference page maps by page name
- */
-export type ProcessedReferencePagesByIdByPageName = Record<
-  ReferencePageName,
-  ProcessedReferencePagesById
->;
-
-/**
- * Type for all page maps by page name
- */
-export type ProcessedPagesByIdByPageName = Record<PageName, ProcessedPagesById>;
-
-/**
- * Type for page processors
- */
-export type Processor = (pages: unknown) => ProcessedPagesById;
-
-/**
- * Type for the result of fetching and processing Notion pages
- */
-export type FetchAndProcessNotionPagesResult = {
-  atlasPages: ProcessedAtlasPagesByIdByPageName;
-  referencePages: {
-    masterStatus: TProcessedMasterStatusById;
-    hub: TProcessedHubById;
-  };
-};
 
 /**
  * Type for Notion data by ID

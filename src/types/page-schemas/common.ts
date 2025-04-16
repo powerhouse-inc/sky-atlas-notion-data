@@ -23,18 +23,6 @@ export const CommonPageData = z.object({
 });
 
 /**
- * Type helper for page data with custom properties
- * 
- * This type is used to create strongly-typed page data types by combining
- * the common page data with custom property schemas.
- * 
- * @template TProperties - The shape of custom properties to add to the page
- */
-export type TPageData<TProperties extends z.ZodRawShape> = z.infer<
-  z.ZodObject<TProperties>
->;
-
-/**
  * Common properties present in all Notion pages in our databases
  * 
  * This schema defines properties that are present in all our Notion pages:

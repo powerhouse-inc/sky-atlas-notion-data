@@ -92,7 +92,7 @@ export async function makeAtlasDataHtmlDocument(viewNodeTree: ViewNodeTree, form
  * @param {Object} [formatOptions=prettierOptions] - Prettier formatting options
  * @returns {Promise<string>} A formatted HTML string
  */
-export async function makeAtlasDataHtmlString(viewNodeTree: ViewNodeTree, formatOptions: object = prettierOptions): Promise<string> {
+async function makeAtlasDataHtmlString(viewNodeTree: ViewNodeTree, formatOptions: object = prettierOptions): Promise<string> {
   const htmlString = viewNodeTree.map((viewNode) => renderViewNodeToHtmlString(viewNode)).join("");
   const formatted = await format(htmlString, formatOptions);
   return formatted;
@@ -103,7 +103,7 @@ export async function makeAtlasDataHtmlString(viewNodeTree: ViewNodeTree, format
  * @param {ViewNode} viewNode - The view node to render
  * @returns {string} The rendered HTML string
  */
-export function renderViewNodeToHtmlString(viewNode: ViewNode) {
+function renderViewNodeToHtmlString(viewNode: ViewNode) {
   if (viewNode.type === "scope") {
     return renderToString(<Scope node={viewNode} />);
   }

@@ -28,22 +28,6 @@ import {
   TENET,
 } from "../constants.js";
 
-export const pageProperties: Record<PageName, PagePropertiesList> = {
-  [ACTIVE_DATA]: activeDataProperties as PagePropertiesList,
-  [ANNOTATION]: annotationsProperties as PagePropertiesList,
-  [ARTICLE]: articlesProperties as PagePropertiesList,
-  [HUB]: hubProperties as PagePropertiesList,
-  [MASTER_STATUS]: masterStatusProperties as PagePropertiesList,
-  [NEEDED_RESEARCH]: neededResearchProperties as PagePropertiesList,
-  [ORIGINAL_CONTEXT_DATA]: originalContextDataProperties as PagePropertiesList,
-  [SCENARIO]: scenariosProperties as PagePropertiesList,
-  [SCENARIO_VARIATION]: scenarioVariationsProperties as PagePropertiesList,
-  [SCOPE]: scopesProperties as PagePropertiesList,
-  [SECTION]: sectionsProperties as PagePropertiesList,
-  [TENET]: tenetsProperties as PagePropertiesList,
-  [AGENT]: agentProperties as PagePropertiesList,
-};
-
 export const propertyIds: Record<PageName, string[]> = {
   [ACTIVE_DATA]: activeDataProperties.map((item) => item.id),
   [ANNOTATION]: annotationsProperties.map((item) => item.id),

@@ -12,6 +12,10 @@ import type {
   NotionDataById,
 } from "./types/processed-data.js";
 
+/* Takes all of the notion data and puts it into a map by id.
+ * 
+ * This is used to look up data for a given id when building the Atlas Explorer.
+*/
 export async function makeNotionDataById(args: {
   processedAtlasPagesByIdByPageName: ProcessedAtlasPagesByIdByPageName;
   processedHubById: TProcessedHubById;
@@ -23,7 +27,7 @@ export async function makeNotionDataById(args: {
     masterStatusNameStrings,
   } = args;
 
-  const viewNodeInputs = {} as NotionDataById;
+  const notionDataById = {} as NotionDataById;
 
   for (const pageName of Object.keys(processedAtlasPagesByIdByPageName)) {
     const items = makeNotionDataForPage(
@@ -33,12 +37,13 @@ export async function makeNotionDataById(args: {
     );
 
     for (const item of Object.values(items)) {
-      viewNodeInputs[item.id] = item;
+      notionDataById[item.id] = item;
     }
   }
 
-  return viewNodeInputs;
+  return notionDataById;
 }
+
 function makeNotionDataForPage(
   processedAtlasPagesById: ProcessedAtlasPagesById,
   masterStatusNameStrings: Record<string, string>,

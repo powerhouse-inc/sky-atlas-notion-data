@@ -31,6 +31,13 @@ export const AGENT = "agent";
 export const AGENT_ARTIFACT = "agentArtifact";
 export const SKY_PRIMITIVE = "skyPrimitive";
 
+/**
+ * Atlas page names
+ * 
+ * These are the names of the pages that are used in the Atlas Explorer.
+ * 
+ * Excluding the reference pages.
+ */
 export const atlasPageNames = [
   SCOPE,
   ARTICLE,
@@ -45,6 +52,11 @@ export const atlasPageNames = [
   AGENT,
 ] as const;
 
+/* 
+ * Reference pages are not displayed in the Atlas Explorer.
+ * 
+ * They are used to look up data for the Atlas pages.
+*/
 export const referencePageNames = [HUB, MASTER_STATUS] as const;
 
 export const allPageNames = [...atlasPageNames, ...referencePageNames] as const;
@@ -84,6 +96,7 @@ export const allowedPageFieldTypes = [
   "number",
   "url",
   "files",
+  "formula",
 ] as const;
 
 export const notionDatabaseFilters: QueryDatabaseParameters["filter"] = {
