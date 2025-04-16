@@ -1,10 +1,10 @@
 // #!/usr/bin/env node
 import {
-  type ViewNodeMap,
   type ViewNode,
   makeViewNodeTitleText,
   getNonSupportDocs,
   getSupportDocs,
+  type ViewNodeTree
 } from "../src/index.js";
 
 /**
@@ -15,14 +15,11 @@ import {
  * 
  * This simplified data is useful for the Github snapshots of the Atlas data, because it is easier to see the changes than when looking at the JSON data.
  */
-export function makeSimplifiedAtlasData(treeMap: ViewNodeMap): string[] {
-  const scopes = Object.values(treeMap).filter(
-    (node) => node?.type === "scope",
-  );
+export function makeSimplifiedAtlasData(viewNodeTree: ViewNodeTree): string[] {
   const textLines: string[] = [];
 
-  for (const scope of scopes) {
-    printNodeTree(scope!);
+  for (const node of viewNodeTree) {
+    printNodeTree(node);
   }
 
   function printNodeTree(node: ViewNode, indent = 0) {
