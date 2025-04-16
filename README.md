@@ -16,7 +16,6 @@ This project fetches data from Notion pages, processes it, and creates a structu
 1. **Notion Data Fetching**
    - Fetches raw data from Notion pages
    - Stores in `data/notion-pages/` directory
-   - Includes Hub data and all Atlas pages
    - Preserves Notion's original structure and relationships
 
 2. **Initial Processing**
