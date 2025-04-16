@@ -255,24 +255,14 @@ async function makeAtlasData(args: {
 
   await writeJsonToFile(`${outputPath}/atlas-data.json`, viewNodeTree);
   await writeJsonToFile(`${outputPath}/view-node-map.json`, viewNodeMap);
-  await writeJsonToFile(`${outputPath}/slug-lookup.json`, slugLookup);
   await writeTxtToFile(`${outputPath}/view-node-counts.txt`, nodeCountsText);
   await writeTxtToFile(`${outputPath}/simplified-atlas-tree.txt`, simplifiedViewNodeTreeTxt);
   // for legacy use
   await writeJsonToFile(`${outputPath}/view-node-tree.json`, viewNodeTree);
 
-  const htmlDocument = await makeAtlasDataHtmlDocument(viewNodeTree);
-  await writeHtmlToFile(`${outputPath}/atlas-data.html`, htmlDocument);
-  await writeJsonToFile(`${outputPath}/atlas-data-html.json`, htmlDocument);
-  const htmlDocumentViewNodeMap = await makeHtmlDocumentViewNodeMap(viewNodeMap);
-  await writeJsonToFile(
-    `${outputPath}/atlas-data-html-view-node-map.json`,
-    htmlDocumentViewNodeMap
-  );
   return {
     viewNodeTree,
     viewNodeMap,
-    slugLookup,
     nodeCountsText,
     simplifiedViewNodeTreeTxt,
   };
@@ -437,9 +427,9 @@ Output Files:
   - data/notion-pages/      Raw Notion page data
   - data/processed/         Processed Notion page data
   - data/parsed/            Parsed data ready for tree generation
-  - data/view-node-tree.json       Generated tree structure
-  - data/view-node-map.json        Map of nodes in the tree
-  - data/slug-lookup.json          Mapping of IDs to slugs
+  - data/atlas-data.json      Generated tree structure
+  - data/view-node-map.json        Map of nodes in the tree (used in nextjs Atlas Explorer)
+  - data/view-node-tree.json       Same as atlas-data.json (for legacy use)
 `);
   process.exit(0);
 }
