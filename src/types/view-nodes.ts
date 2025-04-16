@@ -74,9 +74,7 @@ export type ViewNodeTitle = {
  */
 export type CommonItemProperties = {
   id: string;
-  masterStatus: string[];
   hubUrls: string[];
-  masterStatusNames: string[];
   docNo: string;
   name: string;
   content: TNodeContent;

@@ -19,12 +19,10 @@ import type {
 export async function makeNotionDataById(args: {
   processedAtlasPagesByIdByPageName: ProcessedAtlasPagesByIdByPageName;
   processedHubById: TProcessedHubById;
-  masterStatusNameStrings: Record<string, string>;
 }) {
   const {
     processedAtlasPagesByIdByPageName,
     processedHubById,
-    masterStatusNameStrings,
   } = args;
 
   const notionDataById = {} as NotionDataById;
@@ -32,7 +30,6 @@ export async function makeNotionDataById(args: {
   for (const pageName of Object.keys(processedAtlasPagesByIdByPageName)) {
     const items = makeNotionDataForPage(
       processedAtlasPagesByIdByPageName[pageName as AtlasPageName],
-      masterStatusNameStrings,
       processedHubById,
     );
 
@@ -46,16 +43,10 @@ export async function makeNotionDataById(args: {
 
 function makeNotionDataForPage(
   processedAtlasPagesById: ProcessedAtlasPagesById,
-  masterStatusNameStrings: Record<string, string>,
   processedHubById: TProcessedHubById,
 ) {
   const items: Items = {};
   for (const processed of Object.values(processedAtlasPagesById)) {
-    const masterStatus = getIds(processed.masterStatus);
-    const masterStatusNames = getMasterStatusNames(
-      masterStatus,
-      masterStatusNameStrings,
-    );
     const hubUrls = getIds(processed.hub)
       .map((id) => processedHubById[id]?.url)
       .filter((item) => typeof item === "string");
@@ -68,8 +59,6 @@ function makeNotionDataForPage(
       content: processed.content,
       children: getIds(processed.children),
       files: processed.files ?? [],
-      masterStatus,
-      masterStatusNames,
       hubUrls,
     };
 

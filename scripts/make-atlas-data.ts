@@ -13,18 +13,17 @@ import {
   type ViewNodeMap,
   type ViewNodeTree,
   handleAgents,
-  type TProcessedMasterStatusById,
   type TProcessedHubById,
   DEFAULT_OUTPUT_PATH,
   makeHtmlDocumentViewNodeMap,
-} from "../src/index.js";
-import { parseArgs } from "util";
-import fs from "fs";
-import { mkdir } from "node:fs/promises";
-import { Octokit } from "octokit";
-import { handleEnv } from "./handleEnv.js";
-import { writeHtmlToFile, writeJsonToFile, writeTxtToFile } from "./utils.js";
-import { makeAtlasDataHtmlDocument } from "../src/components/make-atlas-data-html-string.js";
+} from '../src/index.js';
+import { parseArgs } from 'util';
+import fs from 'fs';
+import { mkdir } from 'node:fs/promises';
+import { Octokit } from 'octokit';
+import { handleEnv } from './handleEnv.js';
+import { writeHtmlToFile, writeJsonToFile, writeTxtToFile } from './utils.js';
+import { makeAtlasDataHtmlDocument } from '../src/components/make-atlas-data-html-string.js';
 
 handleEnv();
 main();
@@ -56,19 +55,19 @@ async function main() {
     args: process.argv.slice(2),
     options: {
       outputPath: {
-        type: "string",
+        type: 'string',
       },
       useLocalData: {
-        type: "boolean",
+        type: 'boolean',
       },
       skipImportApi: {
-        type: "boolean",
+        type: 'boolean',
       },
       skipGithubSnapshot: {
-        type: "boolean",
+        type: 'boolean',
       },
       help: {
-        type: "boolean",
+        type: 'boolean',
       },
     },
     strict: true,
@@ -82,27 +81,21 @@ async function main() {
   const importApiUrl = process.env.IMPORT_API_URL;
   const importApiKey = process.env.IMPORT_API_KEY;
   const githubToken = process.env.GITHUB_TOKEN;
-  const outputPath =
-    values.outputPath ?? process.env.OUTPUT_PATH ?? DEFAULT_OUTPUT_PATH;
-  const useLocalData =
-    values.useLocalData ?? process.env.USE_LOCAL_DATA === "true";
-  const skipImportApi =
-    values.skipImportApi ?? process.env.SKIP_IMPORT_API === "true";
+  const outputPath = values.outputPath ?? process.env.OUTPUT_PATH ?? DEFAULT_OUTPUT_PATH;
+  const useLocalData = values.useLocalData ?? process.env.USE_LOCAL_DATA === 'true';
+  const skipImportApi = values.skipImportApi ?? process.env.SKIP_IMPORT_API === 'true';
   const skipGithubSnapshot =
-    values.skipGithubSnapshot ?? process.env.SKIP_GITHUB_SNAPSHOT === "true";
+    values.skipGithubSnapshot ?? process.env.SKIP_GITHUB_SNAPSHOT === 'true';
 
-  const { viewNodeTree, viewNodeMap, simplifiedViewNodeTreeTxt } =
-    await makeAtlasData({
-      outputPath,
-      notionApiKey,
-      useLocalData,
-    });
+  const { viewNodeTree, viewNodeMap, simplifiedViewNodeTreeTxt } = await makeAtlasData({
+    outputPath,
+    notionApiKey,
+    useLocalData,
+  });
 
   if (!skipGithubSnapshot) {
     if (!githubToken) {
-      console.warn(
-        "GITHUB_TOKEN is not set, skipping snapshot commit to Github",
-      );
+      console.warn('GITHUB_TOKEN is not set, skipping snapshot commit to Github');
     } else {
       await commitSnapshotToGithub({
         githubToken,
@@ -114,14 +107,10 @@ async function main() {
 
   if (!skipImportApi) {
     if (!importApiKey) {
-      console.warn(
-        "WARNING: IMPORT_API_KEY is not set, skipping import API post",
-      );
+      console.warn('WARNING: IMPORT_API_KEY is not set, skipping import API post');
     }
     if (!importApiUrl) {
-      console.warn(
-        "WARNING: IMPORT_API_URL is not set, skipping import API post",
-      );
+      console.warn('WARNING: IMPORT_API_URL is not set, skipping import API post');
     }
     if (importApiKey && importApiUrl) {
       await postToImportApi({ importApiKey, importApiUrl, viewNodeMap });
@@ -146,25 +135,20 @@ async function makeAtlasData(args: {
 
   if (!notionApiKey && !useLocalData) {
     console.warn(
-      "  WARNING: Notion API_KEY env variable is not set, attempting to use data from local files.",
+      '  WARNING: Notion API_KEY env variable is not set, attempting to use data from local files.'
     );
   }
 
   const notionPagesOutputPath = `${outputPath}/notion-pages`;
   const processedOutputPath = `${outputPath}/processed`;
   const parsedOutputPath = `${outputPath}/parsed`;
-  const directories = [
-    outputPath,
-    notionPagesOutputPath,
-    processedOutputPath,
-    parsedOutputPath,
-  ];
+  const directories = [outputPath, notionPagesOutputPath, processedOutputPath, parsedOutputPath];
 
   // Check if local data exists when useLocalData is true
   if (useLocalData || !notionApiKey) {
     if (!fs.existsSync(notionPagesOutputPath)) {
       console.error(
-        "Error: --useLocalData option requires existing local data, but the notion-pages directory is missing",
+        'Error: --useLocalData option requires existing local data, but the notion-pages directory is missing'
       );
       process.exit(1);
     }
@@ -190,11 +174,11 @@ async function makeAtlasData(args: {
 
     if (missingFiles.length > 0) {
       console.error(
-        "Error: --useLocalData option requires existing local data, but the following files/directories are missing:",
+        'Error: --useLocalData option requires existing local data, but the following files/directories are missing:'
       );
       missingFiles.forEach((item) => console.error(`  - ${item}`));
       console.error(
-        "\nPlease run the script without --useLocalData first to fetch data from Notion.",
+        '\nPlease run the script without --useLocalData first to fetch data from Notion.'
       );
       process.exit(1);
     }
@@ -204,13 +188,6 @@ async function makeAtlasData(args: {
     await mkdir(dir, { recursive: true });
   }
 
-  const masterStatusNotionPage = await getNotionPage({
-    notionApiKey,
-    outputPath,
-    pageName: MASTER_STATUS,
-    useLocalData,
-    noFilter: true,
-  });
   const hubNotionPage = await getNotionPage({
     notionApiKey,
     outputPath,
@@ -226,34 +203,15 @@ async function makeAtlasData(args: {
   });
 
   if (!useLocalData) {
-    await writeJsonToFile(
-      `${notionPagesOutputPath}/${MASTER_STATUS}.json`,
-      masterStatusNotionPage,
-    );
-
-    await writeJsonToFile(
-      `${notionPagesOutputPath}/${HUB}.json`,
-      hubNotionPage,
-    );
+    await writeJsonToFile(`${notionPagesOutputPath}/${HUB}.json`, hubNotionPage);
 
     for (const pageName of atlasPageNames) {
       await writeJsonToFile(
         `${notionPagesOutputPath}/${pageName}.json`,
-        fetchAtlasNotionPagesResult[pageName],
+        fetchAtlasNotionPagesResult[pageName]
       );
     }
   }
-
-  const processedMasterStatusById =
-    await processNotionPage<TProcessedMasterStatusById>({
-      page: masterStatusNotionPage,
-      pageName: MASTER_STATUS,
-    });
-
-  await writeJsonToFile(
-    `${processedOutputPath}/${MASTER_STATUS}.json`,
-    processedMasterStatusById,
-  );
 
   const processedHubById = await processNotionPage<TProcessedHubById>({
     page: hubNotionPage,
@@ -263,67 +221,43 @@ async function makeAtlasData(args: {
   await writeJsonToFile(`${processedOutputPath}/${HUB}.json`, processedHubById);
 
   const processedAtlasPagesByIdByPageName = await processAtlasNotionPages(
-    fetchAtlasNotionPagesResult,
+    fetchAtlasNotionPagesResult
   );
 
   for (const pageName of atlasPageNames) {
     await writeJsonToFile(
       `${processedOutputPath}/${pageName}.json`,
-      processedAtlasPagesByIdByPageName[pageName],
+      processedAtlasPagesByIdByPageName[pageName]
     );
   }
-
-  const masterStatusNameStrings: Record<string, string> = {};
-  for (const status of Object.values(processedMasterStatusById)) {
-    if (status.nameString) {
-      masterStatusNameStrings[status.id] = status.nameString;
-    }
-  }
-
-  await writeJsonToFile(
-    `${parsedOutputPath}/${MASTER_STATUS}.json`,
-    masterStatusNameStrings,
-  );
 
   const { section, agent } = processedAtlasPagesByIdByPageName;
   const sectionWithAgents = handleAgents(
     section as TProcessedSectionsById,
-    agent as TProcessedSectionsById,
+    agent as TProcessedSectionsById
   );
   processedAtlasPagesByIdByPageName.section = sectionWithAgents;
 
   const notionDataById = await makeNotionDataById({
     processedAtlasPagesByIdByPageName,
     processedHubById,
-    masterStatusNameStrings,
   });
 
-  console.log("created notion data by id");
+  console.log('created notion data by id');
 
-  await writeJsonToFile(
-    `${parsedOutputPath}/notion-data-by-id.json`,
-    notionDataById,
-  );
+  await writeJsonToFile(`${parsedOutputPath}/notion-data-by-id.json`, notionDataById);
 
-  const {
-    viewNodeTree,
-    viewNodeMap,
-    slugLookup,
-    nodeCountsText,
-    simplifiedViewNodeTreeTxt,
-  } = buildAtlasDataFromNotionData(notionDataById);
+  const { viewNodeTree, viewNodeMap, slugLookup, nodeCountsText, simplifiedViewNodeTreeTxt } =
+    buildAtlasDataFromNotionData(notionDataById);
 
-  console.log("built atlas data from notion data");
+  console.log('built atlas data from notion data');
   console.log(nodeCountsText);
 
   await writeJsonToFile(`${outputPath}/atlas-data.json`, viewNodeTree);
   await writeJsonToFile(`${outputPath}/view-node-map.json`, viewNodeMap);
   await writeJsonToFile(`${outputPath}/slug-lookup.json`, slugLookup);
   await writeTxtToFile(`${outputPath}/view-node-counts.txt`, nodeCountsText);
-  await writeTxtToFile(
-    `${outputPath}/simplified-atlas-tree.txt`,
-    simplifiedViewNodeTreeTxt,
-  );
+  await writeTxtToFile(`${outputPath}/simplified-atlas-tree.txt`, simplifiedViewNodeTreeTxt);
   // for legacy use
   await writeJsonToFile(`${outputPath}/view-node-tree.json`, viewNodeTree);
 
@@ -331,7 +265,10 @@ async function makeAtlasData(args: {
   await writeHtmlToFile(`${outputPath}/atlas-data.html`, htmlDocument);
   await writeJsonToFile(`${outputPath}/atlas-data-html.json`, htmlDocument);
   const htmlDocumentViewNodeMap = await makeHtmlDocumentViewNodeMap(viewNodeMap);
-  await writeJsonToFile(`${outputPath}/atlas-data-html-view-node-map.json`, htmlDocumentViewNodeMap);
+  await writeJsonToFile(
+    `${outputPath}/atlas-data-html-view-node-map.json`,
+    htmlDocumentViewNodeMap
+  );
   return {
     viewNodeTree,
     viewNodeMap,
@@ -356,8 +293,8 @@ async function commitSnapshotToGithub(args: {
   const { githubToken, viewNodeTree, simplifiedViewNodeTreeTxt } = args;
 
   const octokit = new Octokit({ auth: githubToken });
-  const owner = "powerhouse-inc";
-  const repo = "sky-atlas-archive";
+  const owner = 'powerhouse-inc';
+  const repo = 'sky-atlas-archive';
 
   try {
     const { data: refData } = await octokit.rest.git.getRef({
@@ -375,15 +312,15 @@ async function commitSnapshotToGithub(args: {
     });
     const treeSha = commitData.tree.sha;
 
-    const timestamp = new Date().toISOString().replace(/[:]/g, "-");
+    const timestamp = new Date().toISOString().replace(/[:]/g, '-');
 
     // Prepare new files to commit
     const files = [
       {
-        path: "atlas-tree.json",
+        path: 'atlas-tree.json',
         content: JSON.stringify(viewNodeTree, null, 2),
       },
-      { path: "simplified-atlas-tree.txt", content: simplifiedViewNodeTreeTxt },
+      { path: 'simplified-atlas-tree.txt', content: simplifiedViewNodeTreeTxt },
       {
         path: `snapshots/${timestamp}.json`,
         content: JSON.stringify(viewNodeTree, null, 2),
@@ -401,8 +338,8 @@ async function commitSnapshotToGithub(args: {
       base_tree: treeSha,
       tree: files.map(({ path, content }) => ({
         path,
-        mode: "100644",
-        type: "blob",
+        mode: '100644',
+        type: 'blob',
         content,
       })),
     });
@@ -424,9 +361,9 @@ async function commitSnapshotToGithub(args: {
       sha: newCommit.sha,
     });
 
-    console.log("Successfully committed snapshot to Github");
+    console.log('Successfully committed snapshot to Github');
   } catch (error) {
-    console.error("Error committing snapshot to Github");
+    console.error('Error committing snapshot to Github');
     console.error(error);
   }
 }
@@ -446,20 +383,20 @@ async function postToImportApi(args: {
   const { importApiKey, importApiUrl, viewNodeMap } = args;
   try {
     const request = new Request(importApiUrl, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(viewNodeMap, null, 2),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${importApiKey}`,
       },
     });
 
     const response = await fetch(request);
 
-    console.log("Successfully posted to import API");
+    console.log('Successfully posted to import API');
     console.log(response);
   } catch (error) {
-    console.error("Error posting to import API");
+    console.error('Error posting to import API');
     console.error(error);
   }
 }
