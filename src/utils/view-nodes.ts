@@ -1,4 +1,4 @@
-import type { Item, SectionItem } from "../types/index.js";
+import type { NotionDataItem, SectionNotionDataItem } from "../types/index.js";
 import { isSectionDocType } from "./processing.js";
 
 /**
@@ -106,6 +106,6 @@ export function getLastElement(s: string) {
 /**
  * Type guard to check if an item is a section item
  */
-export function isSectionItem(item: Item): item is SectionItem {
+export function isSectionItem(item: NotionDataItem): item is SectionNotionDataItem {
   return isSectionDocType(item.type);
 }

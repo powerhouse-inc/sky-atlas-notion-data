@@ -72,7 +72,7 @@ export type ViewNodeTitle = {
  * Common properties shared by all items
  * Forms the base for both default and section items
  */
-export type CommonItemProperties = {
+export type CommonNotionDataProperties = {
   id: string;
   hubUrls: string[];
   docNo: string;
@@ -86,7 +86,7 @@ export type CommonItemProperties = {
  * Default item type for documents without special processing
  * Extends common properties without section-specific fields
  */
-export type DefaultItem = CommonItemProperties & {
+export type DefaultNotionDataItem = CommonNotionDataProperties & {
   type: TDocType;
   parents?: undefined;
   number?: undefined;
@@ -98,7 +98,7 @@ export type DefaultItem = CommonItemProperties & {
  * Section item type with additional fields for hierarchy and special flags
  * Used for documents that require special processing
  */
-export type SectionItem = CommonItemProperties & {
+export type SectionNotionDataItem = CommonNotionDataProperties & {
   type: TSectionDocType;
   parents: string[];
   number: number | null;
@@ -109,12 +109,12 @@ export type SectionItem = CommonItemProperties & {
 /**
  * Union type of all possible item types
  */
-export type Item = DefaultItem | SectionItem;
+export type NotionDataItem = DefaultNotionDataItem | SectionNotionDataItem;
 
 /**
  * Map of items by ID
  */
-export type Items = Record<string, Item>;
+export type NotionDataItemsById = Record<string, NotionDataItem>;
 
 /**
  * Map of hub information by ID

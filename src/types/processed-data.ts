@@ -21,7 +21,7 @@ import {
 } from "../constants.js";
 import { makeSchemaById } from "../utils/processing.js";
 import { RichTextAnnotations } from "./notion-data.js";
-import type { Item } from "./view-nodes.js";
+import type { NotionDataItem } from "./view-nodes.js";
 
 /**
  * Schema for Notion's unique ID fields, which combine a prefix and number
@@ -495,6 +495,6 @@ export type ProcessedAtlasPagesByIdByPageName = Record<
 /**
  * Type for Notion data by ID
  */
-export type NotionDataById = Record<string, Item>;
+export type NotionDataById = Record<string, NotionDataItem>;
 
 

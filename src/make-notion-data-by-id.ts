@@ -1,9 +1,7 @@
 import {
-  getIds,
-  getMasterStatusNames,
-  type Items,
+  getIds, type NotionDataItemsById,
   type TProcessedHubById,
-  ProcessedSection,
+  ProcessedSection
 } from "./index.js";
 import type {
   AtlasPageName,
@@ -45,13 +43,13 @@ function makeNotionDataForPage(
   processedAtlasPagesById: ProcessedAtlasPagesById,
   processedHubById: TProcessedHubById,
 ) {
-  const items: Items = {};
+  const notionDataItemsById: NotionDataItemsById = {};
   for (const processed of Object.values(processedAtlasPagesById)) {
     const hubUrls = getIds(processed.hub)
       .map((id) => processedHubById[id]?.url)
       .filter((item) => typeof item === "string");
 
-    items[processed.id] = {
+    notionDataItemsById[processed.id] = {
       id: processed.id,
       type: processed.type,
       docNo: processed.docNoString,
@@ -65,12 +63,12 @@ function makeNotionDataForPage(
     if (ProcessedSection.safeParse(processed).success) {
       const { parents, number, isAgentArtifact, isSkyPrimitive } =
         ProcessedSection.parse(processed);
-      items[processed.id].parents = getIds(parents);
-      items[processed.id].number = number;
-      items[processed.id].isAgentArtifact = isAgentArtifact ?? false;
-      items[processed.id].isSkyPrimitive = isSkyPrimitive ?? false;
+      notionDataItemsById[processed.id].parents = getIds(parents);
+      notionDataItemsById[processed.id].number = number;
+      notionDataItemsById[processed.id].isAgentArtifact = isAgentArtifact ?? false;
+      notionDataItemsById[processed.id].isSkyPrimitive = isSkyPrimitive ?? false;
     }
   }
 
-  return items;
+  return notionDataItemsById;
 }

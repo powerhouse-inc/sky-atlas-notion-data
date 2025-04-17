@@ -205,16 +205,7 @@ The project transforms Notion data into several interconnected data structures:
 
    5. **Example Numbering**
       ```
-      A.1 - Scope 1
-      A.1.1 - Article 1
-      A.1.1.1 - Section 1
-      A.1.1.1.1 - Category 1
-      A.1.1.1.1.1 - Sub-item 1
-      A.1.1.1.1.2 - Sub-item 2
-      A.1.1.1.2 - Category 2
-      A.1.1.1.2.1 - Sub-item 3
-      A.1.AG1 - Agent Artifact 1
-      A.1.AG1.P1 - Sky Primitive 1
+     See existing tree and https://www.notion.so/atlas-axis/7b5370146f1e448897b189299222e206?v=e21c5c37020f4935a58d45b750d9bd1e&pvs=4
       ```
 
 6. **Hub and Relationships**

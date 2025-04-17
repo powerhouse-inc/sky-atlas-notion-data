@@ -14,16 +14,14 @@ import {
   type ViewNodeTree,
   handleAgents,
   type TProcessedHubById,
-  DEFAULT_OUTPUT_PATH,
-  makeHtmlDocumentViewNodeMap,
+  DEFAULT_OUTPUT_PATH
 } from '../src/index.js';
 import { parseArgs } from 'util';
 import fs from 'fs';
 import { mkdir } from 'node:fs/promises';
 import { Octokit } from 'octokit';
 import { handleEnv } from './handleEnv.js';
-import { writeHtmlToFile, writeJsonToFile, writeTxtToFile } from './utils.js';
-import { makeAtlasDataHtmlDocument } from '../src/components/make-atlas-data-html-string.js';
+import { writeJsonToFile, writeTxtToFile } from './utils.js';
 
 handleEnv();
 main();
@@ -247,7 +245,7 @@ async function makeAtlasData(args: {
 
   await writeJsonToFile(`${parsedOutputPath}/notion-data-by-id.json`, notionDataById);
 
-  const { viewNodeTree, viewNodeMap, slugLookup, nodeCountsText, simplifiedViewNodeTreeTxt } =
+  const { viewNodeTree, viewNodeMap, nodeCountsText, simplifiedViewNodeTreeTxt } =
     buildAtlasDataFromNotionData(notionDataById);
 
   console.log('built atlas data from notion data');
