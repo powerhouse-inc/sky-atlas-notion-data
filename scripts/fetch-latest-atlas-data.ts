@@ -1,8 +1,10 @@
 // #!/usr/bin/env node
 import { parseArgs } from "util";
 import { DEFAULT_ATLAS_DATA_URL, DEFAULT_OUTPUT_PATH } from "../src/constants.js";
-import { writeFileSync } from "fs";
+import { existsSync } from "fs";
 import { handleEnv } from "./handleEnv.js";
+import { mkdir } from "fs/promises";
+import { writeFile } from "fs/promises";
 
 handleEnv();
 main();
@@ -76,22 +78,27 @@ async function main() {
   
   const atlasDataUrl = args.values.atlasDataUrl ?? process.env.ATLAS_DATA_URL ?? DEFAULT_ATLAS_DATA_URL;
   const outputPath = args.values.outputPath ?? process.env.OUTPUT_PATH ?? DEFAULT_OUTPUT_PATH;
+
+  if (!existsSync(outputPath)) {
+    await mkdir(outputPath);
+  }
+
   try {
     const viewNodeTreeResponse = await fetch(`${atlasDataUrl}/api/atlas-data-json`);
     const viewNodeTreeData = await viewNodeTreeResponse.text();
     console.log(`Successfully fetched view node tree data from ${atlasDataUrl}`);
     console.log(`Writing to ${outputPath}/atlas-data.json`);
-    writeFileSync(`${outputPath}/atlas-data.json`, viewNodeTreeData);
+    await writeFile(`${outputPath}/atlas-data.json`, viewNodeTreeData);
     
     // for legacy reasons
     console.log(`Writing to ${outputPath}/view-node-tree.json`);
-    writeFileSync(`${outputPath}/view-node-tree.json`, viewNodeTreeData);
+    await writeFile(`${outputPath}/view-node-tree.json`, viewNodeTreeData);
 
     const viewNodeMapResponse = await fetch(`${atlasDataUrl}/api/view-node-map`);
     const viewNodeMapData = await viewNodeMapResponse.text();
     console.log(`Successfully fetched view node map data from ${atlasDataUrl}`);
     console.log(`Writing to ${outputPath}/view-node-map.json`);
-    writeFileSync(`${outputPath}/view-node-map.json`, viewNodeMapData);
+    await writeFile(`${outputPath}/view-node-map.json`, viewNodeMapData);
   } catch (error) {
     console.error(`Error fetching latest atlas data: `, error);
   }
