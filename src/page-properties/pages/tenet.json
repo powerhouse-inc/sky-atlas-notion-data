@@ -5,11 +5,6 @@
     "type": "relation"
   },
   {
-    "name": "P0 🅗🅤🅑",
-    "id": "%7CJCS",
-    "type": "relation"
-  },
-  {
     "name": "Doc No (or Temp Name)",
     "id": "title",
     "type": "title"

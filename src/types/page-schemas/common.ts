@@ -27,9 +27,7 @@ export const CommonPageData = z.object({
  * 
  * This schema defines properties that are present in all our Notion pages:
  * - Master Status: Relation to status pages
- * - P0 Hub: Relation to hub pages
  */
 export const CommonPageProperties = z.object({
   "Master Status": Relation,
-  "P0 🅗🅤🅑": Relation,
 });

@@ -3,7 +3,6 @@ import {
   atlasPageNames,
   fetchAtlasNotionPages,
   getNotionPage,
-  HUB,
   makeNotionDataById,
   MASTER_STATUS,
   processAtlasNotionPages,
@@ -13,7 +12,6 @@ import {
   type ViewNodeMap,
   type ViewNodeTree,
   handleAgents,
-  type TProcessedHubById,
   DEFAULT_OUTPUT_PATH
 } from '../src/index.js';
 import { parseArgs } from 'util';
@@ -156,7 +154,6 @@ async function makeAtlasData(args: {
     // Check if required Notion page files exist
     const requiredNotionFiles = [
       `${notionPagesOutputPath}/${MASTER_STATUS}.json`,
-      `${notionPagesOutputPath}/${HUB}.json`,
     ];
 
     // Add Atlas page files to required files
@@ -186,14 +183,6 @@ async function makeAtlasData(args: {
     await mkdir(dir, { recursive: true });
   }
 
-  const hubNotionPage = await getNotionPage({
-    notionApiKey,
-    outputPath,
-    pageName: HUB,
-    useLocalData,
-    noFilter: true,
-  });
-
   const fetchAtlasNotionPagesResult = await fetchAtlasNotionPages({
     notionApiKey,
     outputPath,
@@ -201,8 +190,6 @@ async function makeAtlasData(args: {
   });
 
   if (!useLocalData) {
-    await writeJsonToFile(`${notionPagesOutputPath}/${HUB}.json`, hubNotionPage);
-
     for (const pageName of atlasPageNames) {
       await writeJsonToFile(
         `${notionPagesOutputPath}/${pageName}.json`,
@@ -210,13 +197,6 @@ async function makeAtlasData(args: {
       );
     }
   }
-
-  const processedHubById = await processNotionPage<TProcessedHubById>({
-    page: hubNotionPage,
-    pageName: HUB,
-  });
-
-  await writeJsonToFile(`${processedOutputPath}/${HUB}.json`, processedHubById);
 
   const processedAtlasPagesByIdByPageName = await processAtlasNotionPages(
     fetchAtlasNotionPagesResult
@@ -236,10 +216,7 @@ async function makeAtlasData(args: {
   );
   processedAtlasPagesByIdByPageName.section = sectionWithAgents;
 
-  const notionDataById = await makeNotionDataById({
-    processedAtlasPagesByIdByPageName,
-    processedHubById,
-  });
+  const notionDataById = await makeNotionDataById(processedAtlasPagesByIdByPageName);
 
   console.log('created notion data by id');
 

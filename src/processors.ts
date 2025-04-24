@@ -1,7 +1,6 @@
 import {
   AnnotationsPageSchema,
   ArticlesPageSchema,
-  HubPageSchema,
   MasterStatusPageSchema,
   NeededResearchPageSchema,
   OriginalContextDataPageSchema,
@@ -15,7 +14,6 @@ import {
   type TProcessedActiveDataById,
   type TProcessedAnnotationsById,
   type TProcessedArticlesById,
-  type TProcessedHubById,
   type TProcessedMasterStatusById,
   type TProcessedNeededResearchById,
   type TProcessedOriginalContextDataById,
@@ -40,7 +38,6 @@ import {
   agentArtifactsSectionId,
   ANNOTATION,
   ARTICLE,
-  HUB,
   MASTER_STATUS,
   NEEDED_RESEARCH,
   ORIGINAL_CONTEXT_DATA,
@@ -72,7 +69,6 @@ function processScopes(pages: unknown): TProcessedScopesById {
     ];
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       type: SCOPE,
       docNo,
       docNoString,
@@ -108,7 +104,6 @@ function processArticles(pages: unknown): TProcessedArticlesById {
     ];
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       type: ARTICLE,
       docNo,
       docNoString,
@@ -153,7 +148,6 @@ function processSections(pages: unknown): TProcessedSectionsById {
       name,
       docNoString,
       nameString,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       number: getNumberFromNotionNumber(properties["No."]),
       type: camelCase(getTextFromSelect(properties.Type)) as TDocType,
       content: [
@@ -222,7 +216,6 @@ function processAgents(pages: unknown): TProcessedSectionsById {
       name,
       docNoString,
       nameString,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       number: getNumberFromNotionStringFormula(properties["No."]),
       type: camelCase(getTextFromSelect(properties["Doc Type"])) as TDocType,
       content: [{ text: getContentFromRichText(properties.Content) }],
@@ -251,7 +244,6 @@ function processAnnotations(pages: unknown): TProcessedAnnotationsById {
     ];
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       type: ANNOTATION,
       docNo,
       docNoString,
@@ -283,7 +275,6 @@ function processTenets(pages: unknown): TProcessedTenetsById {
     ];
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       type: TENET,
       docNo,
       docNoString,
@@ -315,7 +306,6 @@ function processScenarios(pages: unknown): TProcessedScenariosById {
     ];
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       type: SCENARIO,
       docNo,
       docNoString,
@@ -361,7 +351,6 @@ function processScenarioVariations(
     ];
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       type: SCENARIO_VARIATION,
       docNo,
       docNoString,
@@ -401,7 +390,6 @@ function processNeededResearch(pages: unknown): TProcessedNeededResearchById {
     const nameString = makeProcessedRichTextString(name);
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       docNo,
       docNoString,
       name,
@@ -435,7 +423,6 @@ function processOriginalContextData(
     const docNoString = makeProcessedRichTextString(docNo);
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       type: ORIGINAL_CONTEXT_DATA,
       docNo,
       docNoString,
@@ -467,23 +454,6 @@ function processMasterStatus(pages: unknown): TProcessedMasterStatusById {
   return processed;
 }
 
-function processHub(pages: unknown): TProcessedHubById {
-  const hubPages = HubPageSchema.parse(pages);
-  const processed: TProcessedHubById = {};
-
-  for (const page of hubPages) {
-    const id = page.id;
-    const properties = page.properties;
-    const url = properties.URL?.url;
-    processed[id] = {
-      id,
-      url,
-    };
-  }
-
-  return processed;
-}
-
 function processActiveData(pages: unknown): TProcessedActiveDataById {
   const activeDataPages = ActiveDataPageSchema.parse(pages);
   const processed: TProcessedActiveDataById = {};
@@ -501,7 +471,6 @@ function processActiveData(pages: unknown): TProcessedActiveDataById {
     ];
     processed[id] = {
       id,
-      hub: getRelations(properties["P0 🅗🅤🅑"]),
       type: ACTIVE_DATA,
       docNo,
       docNoString,
@@ -550,6 +519,5 @@ export const processors = {
   [SCENARIO_VARIATION]: processScenarioVariations,
   [NEEDED_RESEARCH]: processNeededResearch,
   [ORIGINAL_CONTEXT_DATA]: processOriginalContextData,
-  [HUB]: processHub,
   [ACTIVE_DATA]: processActiveData,
 } as const;

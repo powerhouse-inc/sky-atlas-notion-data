@@ -1,7 +1,7 @@
 {
   "name": "@powerhousedao/sky-atlas-notion-data",
   "description": "Fetches and processes Sky Atlas data from Notion",
-  "version": "1.1.5",
+  "version": "1.1.7",
   "author": "Powerhouse DAO",
   "license": "AGPL-3.0",
   "type": "module",

@@ -1,5 +1,4 @@
 import { type ViewNode } from '../types/view-nodes.js';
-import { HubLink } from './hub-link.js';
 import { NodeContent } from './node-content.js';
 import { SupportingDocuments } from './supporting-documents.js';
 import { CategoryHeader } from './category-header.js';
@@ -22,7 +21,6 @@ export function SubDocument(props: Props) {
 
   return (
     <div>
-      <HubLink node={node} />
       <NodeContent node={node} />
       <MediaFiles files={files} />
       <SupportingDocuments supportingDocuments={supportingDocuments} />

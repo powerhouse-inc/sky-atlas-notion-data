@@ -10,7 +10,7 @@ import type {
   ProcessedPagesById,
 } from "./types/index.js";
 import { mkdir } from "node:fs/promises";
-import { propertyIds } from "./page-properties/index.js";
+import { pageProperties } from "./page-properties/index.js";
 import { Client, isFullPage } from "@notionhq/client";
 import {
   type PartialPageObjectResponse,
@@ -18,6 +18,14 @@ import {
 } from "@notionhq/client/build/src/api-endpoints.js";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+
+function formatDuration(ms: number): string {
+  if (ms < 1000) {
+    return `${ms}ms`;
+  }
+  const seconds = (ms / 1000).toFixed(1);
+  return `${seconds}s`;
+}
 
 /**
  * Fetches a single Notion page either from the API or local cache
@@ -55,14 +63,16 @@ export async function getNotionPage(args: {
   const notionPagePath = `${notionPagesDirPath}/${pageName}.json`;
   const fetchFromLocalFile = useLocalData || !notion;
 
+  if (fetchFromLocalFile) {
+    console.log("fetching " + pageName + " from local file");
+  }
+
   const page = fetchFromLocalFile
     ? await fetchPageFromLocalFile(notionPagePath)
     : await fetchPageFromNotionDatabase(notion, pageName, noFilter);
 
   if (fetchFromLocalFile) {
     console.log("fetched " + pageName + " from local file");
-  } else {
-    console.log("fetched " + pageName + " from Notion");
   }
 
   return page;
@@ -99,42 +109,63 @@ export async function fetchPageFromNotionDatabase(
   noFilter: boolean,
 ): Promise<NotionDatabaseQueryResponse[]> {
   const databaseId = pageIds[pageName];
-  const pagePropertyIds = propertyIds[pageName];
+  console.log(`Querying from Notion...`);
+  console.log(`Database name: ${pageName}`);
+  console.log(`Database id: ${databaseId}`);
+  const properties = pageProperties[pageName];
+  if (!properties.length) {
+    console.warn(`WARNING: No properties found for ${pageName}`);
+  } else {
+    console.log("Querying properties:");
+  }
+  for (const property of properties) {
+    console.log(`Property name: ${property.name}`);
+    console.log(`Property id: ${property.id}`);
+    console.log(`Property type: ${property.type}`);
+  }
+  const filterProperties = properties.map((property) => property.id);
   const pages: NotionDatabaseQueryResponse[] = [];
   let cursor: string | undefined = undefined;
+  let pageCount = 1;
+  const startTime = Date.now();
 
   while (true) {
+    const queryStartTime = Date.now();
     const { results, next_cursor } = await notion.databases.query({
       database_id: databaseId,
-      filter_properties: pagePropertyIds,
+      filter_properties: filterProperties,
       start_cursor: cursor,
       filter: noFilter ? undefined : notionDatabaseFilters,
     });
-
+    const queryDuration = Date.now() - queryStartTime;
+    console.log(`Fetched page ${pageCount} with ${results.length} results in ${formatDuration(queryDuration)}`);
     pages.push(...results);
 
     if (!next_cursor) break;
 
     cursor = next_cursor;
+    pageCount++;
   }
 
   for (const page of pages) {
     if (!isFullPage(page)) continue;
     if ("properties" in page) {
-      const properties = page.properties;
-
-      for (const property of Object.values(properties)) {
+      for (const property of Object.values(page.properties)) {
         if (
           property.type === "relation" &&
           "relation" in property &&
           "has_more" in property &&
           property.has_more === true
         ) {
+          const relationStartTime = Date.now();
+          console.log(`Fetching paginated relation ${properties.find((p) => p.id === property.id)?.name} for ${pageName}`);
           const fetchedPageProperties = await handlePaginatedRelations(
             notion,
             page.id,
             property.id,
           );
+          const relationDuration = Date.now() - relationStartTime;
+          console.log(`Fetched relation in ${formatDuration(relationDuration)}`);
 
           property.relation = fetchedPageProperties;
         }
@@ -142,6 +173,8 @@ export async function fetchPageFromNotionDatabase(
     }
   }
 
+  const totalDuration = Date.now() - startTime;
+  console.log(`Fetched ${pages.length} pages from Notion for ${pageName} in ${formatDuration(totalDuration)}`);
   return pages;
 }
 

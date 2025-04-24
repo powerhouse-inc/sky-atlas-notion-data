@@ -11,13 +11,11 @@ import type {
  * - Original document hierarchy and relationships
  * - Content with Notion's incorrect numbering in links and mentions
  * - Navigation structure based on slugs
- * - Hub relationships
  */
 export type RawViewNode = {
   id: string;
   type: TDocType;
   title: ViewNodeTitle;
-  hubUrls: string[];
   content: TNodeContent;
   slugSuffix: string;
   parentSlugSuffix: string | null;
@@ -74,7 +72,6 @@ export type ViewNodeTitle = {
  */
 export type CommonNotionDataProperties = {
   id: string;
-  hubUrls: string[];
   docNo: string;
   name: string;
   content: TNodeContent;
@@ -115,17 +112,6 @@ export type NotionDataItem = DefaultNotionDataItem | SectionNotionDataItem;
  * Map of items by ID
  */
 export type NotionDataItemsById = Record<string, NotionDataItem>;
-
-/**
- * Map of hub information by ID
- */
-export type Hub = Record<
-  string,
-  {
-    id: string;
-    url: string;
-  }
->;
 
 /**
  * Utility type to make complex types more readable in IDEs

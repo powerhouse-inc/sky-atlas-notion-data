@@ -10,11 +10,6 @@
     "type": "relation"
   },
   {
-    "name": "P0 🅗🅤🅑",
-    "id": "zYtu",
-    "type": "relation"
-  },
-  {
     "name": "Doc No (or Temp Name)",
     "id": "title",
     "type": "title"

@@ -7,7 +7,6 @@ export const DEFAULT_ATLAS_DATA_URL =
 
 export const MASTER_STATUS = "masterStatus";
 export const ORIGINAL_CONTEXT_DATA = "originalContextData";
-export const HUB = "hub";
 export const APPROVED = "Approved";
 export const PROVISIONAL = "Provisional";
 export const PLACEHOLDER = "Placeholder";
@@ -52,15 +51,6 @@ export const atlasPageNames = [
   AGENT,
 ] as const;
 
-/* 
- * Reference pages are not displayed in the Atlas Explorer.
- * 
- * They are used to look up data for the Atlas pages.
-*/
-export const referencePageNames = [HUB, MASTER_STATUS] as const;
-
-export const allPageNames = [...atlasPageNames, ...referencePageNames] as const;
-
 export const pageIds: Record<PageName, string> = {
   [SCOPE]: "ebdb403a44bd4d169ec8f9330e955247",
   [ARTICLE]: "15e06a0d07364458a5caeb85d7b54408",
@@ -74,7 +64,6 @@ export const pageIds: Record<PageName, string> = {
   [ACTIVE_DATA]: "5b566dd732464927b8eee6e1b2ff99d9",
   [AGENT]: "1bbf2ff08d73808d9ce3e2122857e262",
   [MASTER_STATUS]: "37f256facc7e40dfa045564ebb347b12",
-  [HUB]: "8c1d950bbee04cc0a5c1a1e18842c224",
 } as const;
 
 export const apiKey = process.env.API_KEY;

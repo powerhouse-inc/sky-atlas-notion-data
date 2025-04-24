@@ -6,6 +6,7 @@ import {
   ARTICLE,
   CATEGORY,
   CORE,
+  type MASTER_STATUS,
   NEEDED_RESEARCH,
   ORIGINAL_CONTEXT_DATA,
   SCENARIO,
@@ -15,9 +16,7 @@ import {
   TENET,
   TYPE_SPECIFICATION,
   type allowedPageFieldTypes,
-  type allPageNames,
   type atlasPageNames,
-  type referencePageNames,
 } from "../constants.js";
 import { makeSchemaById } from "../utils/processing.js";
 import { RichTextAnnotations } from "./notion-data.js";
@@ -121,7 +120,6 @@ export type TProcessedFile = z.infer<typeof ProcessedFile>;
  */
 export const CommonRelations = {
   masterStatus: ProcessedRelations,
-  hub: ProcessedRelations,
   children: ProcessedRelations,
 };
 
@@ -372,44 +370,13 @@ export type TProcessedMasterStatusById = z.infer<
 >;
 
 /**
- * Schema for processed hubs
- * 
- * The hub is not shown in the Atlas Explorer. We use it to look up the provenance links for each page.
- */
-export const ProcessedHub = z.object({
-  id: z.string(),
-  url: z.string().nullish(),
-});
-
-export type TProcessedHub = z.infer<typeof ProcessedHub>;
-
-export const ProcessedHubById = makeSchemaById(ProcessedHub);
-
-export type TProcessedHubById = z.infer<typeof ProcessedHubById>;
-
-/**
  * Type for Atlas page names
  */
 export type AtlasPageNames = typeof atlasPageNames;
 
 export type AtlasPageName = AtlasPageNames[number];
 
-/**
- * Type for reference page names
- * 
- * Reference pages are special because they are not displayed in the Atlas Explorer.
- */
-export type ReferencePageNames = typeof referencePageNames;
-
-export type ReferencePageName = ReferencePageNames[number];
-
-/**
- * Type for all page names
- */
-export type PageNames = typeof allPageNames;
-
-export type PageName = PageNames[number];
-
+export type PageName = AtlasPageNames[number] | typeof MASTER_STATUS;
 /**
  * Type for allowed page field types
  */
@@ -444,18 +411,6 @@ export type ProcessedAtlasPage =
   | TProcessedActiveData;
 
 /**
- * Union type for all reference page types
- * 
- * These are special because they are not displayed in the Atlas Explorer.
- */
-export type ProcessedReferencePage = TProcessedMasterStatus | TProcessedHub;
-
-/**
- * Union type for all processed page types
- */
-export type ProcessedPage = ProcessedAtlasPage | ProcessedReferencePage;
-
-/**
  * Union type for all Atlas page maps
  */
 export type ProcessedAtlasPagesById =
@@ -470,19 +425,7 @@ export type ProcessedAtlasPagesById =
   | TProcessedOriginalContextDataById
   | TProcessedActiveDataById;
 
-/**
- * Union type for all reference page maps
- */
-export type ProcessedReferencePagesById =
-  | TProcessedMasterStatusById
-  | TProcessedHubById;
-
-/**
- * Union type for all processed page maps
- */
-export type ProcessedPagesById =
-  | ProcessedAtlasPagesById
-  | ProcessedReferencePagesById;
+export type ProcessedPagesById = ProcessedAtlasPagesById | TProcessedMasterStatusById;
 
 /**
  * Type for Atlas page maps by page name

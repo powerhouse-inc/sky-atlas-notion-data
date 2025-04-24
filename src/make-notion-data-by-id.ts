@@ -1,6 +1,5 @@
 import {
   getIds, type NotionDataItemsById,
-  type TProcessedHubById,
   ProcessedSection
 } from "./index.js";
 import type {
@@ -14,21 +13,13 @@ import type {
  * 
  * This is used to look up data for a given id when building the Atlas Explorer.
 */
-export async function makeNotionDataById(args: {
-  processedAtlasPagesByIdByPageName: ProcessedAtlasPagesByIdByPageName;
-  processedHubById: TProcessedHubById;
-}) {
-  const {
-    processedAtlasPagesByIdByPageName,
-    processedHubById,
-  } = args;
-
+export async function makeNotionDataById(
+  processedAtlasPagesByIdByPageName: ProcessedAtlasPagesByIdByPageName) {
   const notionDataById = {} as NotionDataById;
 
   for (const pageName of Object.keys(processedAtlasPagesByIdByPageName)) {
     const items = makeNotionDataForPage(
       processedAtlasPagesByIdByPageName[pageName as AtlasPageName],
-      processedHubById,
     );
 
     for (const item of Object.values(items)) {
@@ -41,14 +32,9 @@ export async function makeNotionDataById(args: {
 
 function makeNotionDataForPage(
   processedAtlasPagesById: ProcessedAtlasPagesById,
-  processedHubById: TProcessedHubById,
 ) {
   const notionDataItemsById: NotionDataItemsById = {};
   for (const processed of Object.values(processedAtlasPagesById)) {
-    const hubUrls = getIds(processed.hub)
-      .map((id) => processedHubById[id]?.url)
-      .filter((item) => typeof item === "string");
-
     notionDataItemsById[processed.id] = {
       id: processed.id,
       type: processed.type,
@@ -57,7 +43,6 @@ function makeNotionDataForPage(
       content: processed.content,
       children: getIds(processed.children),
       files: processed.files ?? [],
-      hubUrls,
     };
 
     if (ProcessedSection.safeParse(processed).success) {

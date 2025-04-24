@@ -4,7 +4,6 @@ import {
   getSupportDocs,
   makeViewNodeTitleText,
 } from "../utils/processing.js";
-import { HubLink } from "./hub-link.js";
 import { LinkButton } from "./link-button.js";
 import { NodeContent } from "./node-content.js";
 import { SubDocument } from "./sub-document.js";
@@ -25,7 +24,6 @@ export function Scope(props: Props) {
         <h1 id={node.slugSuffix}><LinkButton node={node} /> {title}</h1>
       </div>
       <div>
-        <HubLink node={node} />
         <NodeContent node={node} />
         <SupportingDocuments supportingDocuments={supportingDocuments} />
         {subDocumentsWithoutSupportingDocuments.map((node) => (

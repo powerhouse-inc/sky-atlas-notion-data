@@ -5,11 +5,6 @@
     "type": "relation"
   },
   {
-    "name": "P0 🅗🅤🅑",
-    "id": "h%3CPr",
-    "type": "relation"
-  },
-  {
     "name": "Doc No",
     "id": "title",
     "type": "title"
