@@ -14,6 +14,7 @@ import type {
   TSectionDocType,
   TSupportDocType,
   TProcessedSectionsById,
+  ViewNodeExtended,
 } from "../types/index.js";
 import {
   RelationArray,
@@ -26,6 +27,7 @@ import {
 } from "../types/index.js";
 import { agentArtifactsSectionId } from "../constants.js";
 import { makeAtlasDataHtmlDocument } from "../components/make-atlas-data-html-string.js";
+import { notionRichTextToMarkdown } from "notion-rich-text-to-markdown";
 
 /**
  * Extracts text content from a title field
@@ -199,7 +201,7 @@ function processRawViewNode(
   slugLookup: Record<string, string>,
   rawViewNodeMap: RawViewNodeMap,
   viewNodeMap: ViewNodeMap,
-): ViewNode {
+): ViewNodeExtended {
   // Avoid processing the same node multiple times
   if (viewNodeMap[node.slugSuffix]) {
     return viewNodeMap[node.slugSuffix]!;
@@ -207,6 +209,10 @@ function processRawViewNode(
 
   // Process content using the updated function
   const content = processContentForViewNode(node, rawViewNodeMap, slugLookup);
+
+  // transform the notion content into markdown
+  // TODO: parse the content into markdown
+  const markdownContent = node.content;
 
   // Recursively process subDocuments
   const subDocuments = node.subDocuments
@@ -217,9 +223,12 @@ function processRawViewNode(
 
   // Create the ViewNode, omitting specified properties and adding processed ones
   const { content: _, subDocuments: __, ...rest } = node;
-  const viewNode: ViewNode = {
+  const viewNode: ViewNodeExtended = {
     ...rest,
     content,
+    // TODO: Implement markdown content
+    // @ts-expect-error
+    markdownContent,
     subDocuments,
   };
 
@@ -287,6 +296,10 @@ function processContentForViewNode(
       }
     })
     .filter((item) => item !== null && item !== undefined);
+}
+
+function processContentAsMarkdownForViewNode(node: RawViewNode) {
+  return "Working on it";
 }
 
 /**

@@ -30,5 +30,6 @@ export const SectionPageProperties = z.object({
   "Parent Article ": Relation,
   "No.": NotionNumber,
   "Files & media": Files,
+  "Global Tags": Relation,
 });
 export const SectionsPageSchema = makePageSchema(SectionPageProperties);

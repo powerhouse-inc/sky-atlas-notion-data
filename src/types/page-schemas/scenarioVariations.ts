@@ -10,6 +10,7 @@ export const ScenarioVariationsPageProperties = z.object({
   "Additional Guidance": RichTextField,
   "Doc No": TitleField,
   "Original Context Data": Relation,
+  "Global Tags": Relation,
 });
 
 export const ScenarioVariationsPageSchema = makePageSchema(

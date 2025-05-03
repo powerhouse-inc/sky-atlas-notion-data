@@ -8,6 +8,7 @@ export const ActiveDataPageProperties = z.object({
   Content: RichTextField,
   "Original Context Data": Relation,
   "Needed Research": Relation,
+  "Global Tags": Relation,
 });
 
 export const ActiveDataPageSchema = makePageSchema(ActiveDataPageProperties);

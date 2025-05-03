@@ -22,6 +22,7 @@ export type RawViewNode = {
   ancestorSlugSuffixes: string[];
   descendantSlugSuffixes: string[];
   subDocuments: RawViewNode[];
+  globalTags: string[];
   files: TProcessedFile[];
 };
 
@@ -33,9 +34,20 @@ export type RawViewNode = {
  * - Maintaining the document hierarchy with corrected references
  * - Preserving navigation and relationship data
  */
-export type ViewNode = Omit<RawViewNode, "content" | "subDocuments"> & {
+export type ViewNode = Omit<RawViewNode, "content" | "subDocuments" | "globalTags"> & {
   content: TProcessedNodeContentItem[];
   subDocuments: ViewNode[];
+};
+
+/**
+ * Extended view node type with additional properties
+ * - markdownContent: Markdown content string
+ * - globalTags: Global tags
+ */
+export type ViewNodeExtended = Omit<RawViewNode, "content" | "subDocuments"> & {
+  content: TProcessedNodeContentItem[];
+  markdownContent: string;
+  subDocuments: ViewNodeExtended[];
 };
 
 /**
@@ -46,7 +58,7 @@ export type RawViewNodeMap = Record<string, RawViewNode | undefined>;
 /**
  * Map of processed view nodes by ID
  */
-export type ViewNodeMap = Record<string, ViewNode | undefined>;
+export type ViewNodeMap = Record<string, ViewNodeExtended | undefined>;
 
 /**
  * Tree structure of processed view nodes
@@ -77,6 +89,7 @@ export type CommonNotionDataProperties = {
   content: TNodeContent;
   children: string[];
   files: TProcessedFile[];
+  globalTags: string[];
 };
 
 /**

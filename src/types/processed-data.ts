@@ -192,6 +192,7 @@ export const SharedSchemaProperties = {
   name: ProcessedRichText,
   docNoString: z.string(),
   nameString: z.string(),
+  globalTags: ProcessedRelations,
   type: DocTypeSchema,
   content: NodeContent,
   files: ProcessedFiles.optional(),

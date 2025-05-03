@@ -7,6 +7,7 @@ const OriginalContextDataPageProperties = z.object({
   Content: RichTextField,
   "Doc No": TitleField,
   "Needed Research": Relation,
+  "Global Tags": Relation,
 });
 export const OriginalContextDataPageSchema = makePageSchema(
   OriginalContextDataPageProperties,

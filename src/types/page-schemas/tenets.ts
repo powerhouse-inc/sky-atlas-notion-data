@@ -9,6 +9,7 @@ export const TenetsPageProperties = z.object({
   "Needed Research": Relation,
   Name: RichTextField,
   Scenarios: Relation,
+  "Global Tags": Relation,
 });
 
 export const TenetsPageSchema = makePageSchema(TenetsPageProperties);

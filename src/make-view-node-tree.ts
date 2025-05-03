@@ -21,6 +21,8 @@ import {
   type NotionDataItem,
   type RawViewNodeMap,
   type ViewNodeMap,
+  type ViewNodeExtended,
+  type ViewNode,
 } from "./types/view-nodes.js";
 import {
   processRawViewNodeMap as addLinkedContentToViewNodes,
@@ -59,7 +61,9 @@ const nodeCounts = {
 export function buildAtlasDataFromNotionData(notionDataById: NotionDataById) {
   const rawViewNodeMap = buildViewNodeTree(notionDataById);
   const viewNodeMap = addLinkedContentToViewNodes(rawViewNodeMap, slugLookup);
-  const viewNodeTree = makeViewNodeTreeFromViewNodeMap(viewNodeMap);
+  const viewNodeTreeExtended = makeViewNodeExtendedTreeFromViewNodeMap(viewNodeMap);
+  // TODO: remove extended fields from viewNodeTreeExtended
+  const viewNodeTree = makeViewNodeTreeFromViewNodeMap(viewNodeTreeExtended);
   const simplifiedViewNodeTreeTxt =
     makeSimplifiedAtlasData(viewNodeTree).join("\n");
   const nodeCountsText = printNodeCounts();
@@ -68,6 +72,7 @@ export function buildAtlasDataFromNotionData(notionDataById: NotionDataById) {
     rawViewNodeMap,
     viewNodeMap,
     viewNodeTree,
+    viewNodeTreeExtended,
     slugLookup,
     nodeCountsText,
     simplifiedViewNodeTreeTxt,
@@ -101,6 +106,7 @@ function buildViewNodeTree(notionDataById: NotionDataById) {
     const parentSlugSuffix = null;
     /* A scope has no ancestor slugs, so its ancestor slug suffixes are an empty array */
     const ancestorSlugSuffixes: string[] = [];
+    const globalTags = scopeNotionData.globalTags;
 
     const subDocuments: RawViewNode[] = [];
     const descendantSlugSuffixes: string[] = [];
@@ -124,6 +130,7 @@ function buildViewNodeTree(notionDataById: NotionDataById) {
       descendantSlugSuffixes,
       subDocuments,
       title,
+      globalTags,
     };
 
     newNode.subDocuments = buildSubDocumentsViewTree(
@@ -243,6 +250,8 @@ function buildSubDocumentsViewTree(
       title: makeDocTitle(subDocument),
     };
 
+    const globalTags = subDocument.globalTags;
+
     const newNode: RawViewNode = {
       id,
       type,
@@ -254,6 +263,7 @@ function buildSubDocumentsViewTree(
       descendantSlugSuffixes,
       subDocuments,
       title,
+      globalTags,
     };
     newNode.subDocuments = buildSubDocumentsViewTree(
       subDocument,
@@ -275,10 +285,25 @@ function buildSubDocumentsViewTree(
   return subDocumentsViewNodeTree;
 }
 
-function makeViewNodeTreeFromViewNodeMap(viewNodeMap: ViewNodeMap) {
+function makeViewNodeExtendedTreeFromViewNodeMap(viewNodeMap: ViewNodeMap) {
   return Object.values(viewNodeMap)
     .filter((node) => node?.type === SCOPE)
     .filter((node) => node !== undefined);
+}
+
+function makeViewNodeTreeFromViewNodeMap(viewNodeTreeExtended: ViewNodeExtended[]) {
+  function filterExtendedNode(node: ViewNodeExtended): ViewNode {
+    const { markdownContent, globalTags, ...rest } = node;
+
+    const viewNode: ViewNode = {
+      ...rest,
+      subDocuments: [...rest.subDocuments.map(filterExtendedNode)],
+    }
+
+    return viewNode;
+  }
+
+  return viewNodeTreeExtended.map(filterExtendedNode);
 }
 
 function printNodeCounts() {

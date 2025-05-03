@@ -43,6 +43,8 @@ function makeNotionDataForPage(
       content: processed.content,
       children: getIds(processed.children),
       files: processed.files ?? [],
+      globalTags: (processed.globalTags ?? []).map((tag) => tag.id),
+      // masterStatus: processed.masterStatus,
     };
 
     if (ProcessedSection.safeParse(processed).success) {
