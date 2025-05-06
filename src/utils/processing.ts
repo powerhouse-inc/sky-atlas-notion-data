@@ -25,7 +25,7 @@ import {
   type TRichTextField,
   type TSelect,
 } from "../types/index.js";
-import { agentArtifactsSectionId } from "../constants.js";
+import { agentArtifactsSectionId, masterStatusesIdMap } from "../constants.js";
 import { makeAtlasDataHtmlDocument } from "../components/make-atlas-data-html-string.js";
 
 /**
@@ -140,6 +140,17 @@ export function getMasterStatusNames(
   parsedMasterStatus: Record<string, string>,
 ): string[] {
   return masterStatusIds.map((id) => parsedMasterStatus[id]);
+}
+
+/**
+ * Gets the master status name from a master status ID
+ * @param {string} masterStatusId - The master status ID
+ * @returns {string | null} The master status name or null if the ID is not found
+ */
+export function getMasterStatusName(masterStatusId?: string): string | null {
+  if (!masterStatusId) return null;
+
+  return masterStatusesIdMap[masterStatusId] ?? null;
 }
 
 /**
