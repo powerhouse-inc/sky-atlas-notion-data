@@ -107,6 +107,7 @@ function buildViewNodeTree(notionDataById: NotionDataById) {
     const ancestorSlugSuffixes: string[] = [];
     const globalTags = scopeNotionData.globalTags;
     const originalContextData = scopeNotionData.originalContextData;
+    const masterStatus = scopeNotionData.masterStatus;
 
     const subDocuments: RawViewNode[] = [];
     const descendantSlugSuffixes: string[] = [];
@@ -132,6 +133,7 @@ function buildViewNodeTree(notionDataById: NotionDataById) {
       title,
       globalTags,
       originalContextData,
+      masterStatus,
     };
 
     newNode.subDocuments = buildSubDocumentsViewTree(
@@ -253,6 +255,7 @@ function buildSubDocumentsViewTree(
 
     const globalTags = subDocument.globalTags;
     const originalContextData = subDocument.originalContextData;
+    const masterStatus = subDocument.masterStatus;
 
     const newNode: RawViewNode = {
       id,
@@ -267,6 +270,7 @@ function buildSubDocumentsViewTree(
       title,
       globalTags,
       originalContextData,
+      masterStatus,
     };
     newNode.subDocuments = buildSubDocumentsViewTree(
       subDocument,

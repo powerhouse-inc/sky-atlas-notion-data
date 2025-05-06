@@ -24,7 +24,19 @@ export type RawViewNode = {
   subDocuments: RawViewNode[];
   globalTags: string[];
   originalContextData: string[];
+  masterStatus: string | null;
   files: TProcessedFile[];
+};
+
+/**
+ * Extended view node type with additional properties
+ * - markdownContent: Markdown content string
+ * - globalTags: Global tags
+ */
+export type ViewNodeExtended = Omit<RawViewNode, "content" | "subDocuments"> & {
+  content: TProcessedNodeContentItem[];
+  subDocuments: ViewNodeExtended[];
+  markdownContent: string;
 };
 
 /**
@@ -35,20 +47,8 @@ export type RawViewNode = {
  * - Maintaining the document hierarchy with corrected references
  * - Preserving navigation and relationship data
  */
-export type ViewNode = Omit<RawViewNode, "content" | "subDocuments" | "globalTags" | "originalContextData"> & {
-  content: TProcessedNodeContentItem[];
+export type ViewNode = Omit<ViewNodeExtended, "subDocuments" | "globalTags" | "originalContextData" | "markdownContent" | "masterStatus"> & {
   subDocuments: ViewNode[];
-};
-
-/**
- * Extended view node type with additional properties
- * - markdownContent: Markdown content string
- * - globalTags: Global tags
- */
-export type ViewNodeExtended = Omit<RawViewNode, "content" | "subDocuments"> & {
-  content: TProcessedNodeContentItem[];
-  markdownContent: string;
-  subDocuments: ViewNodeExtended[];
 };
 
 /**
@@ -92,6 +92,7 @@ export type CommonNotionDataProperties = {
   files: TProcessedFile[];
   globalTags: string[];
   originalContextData: string[];
+  masterStatus: string | null;
 };
 
 /**
