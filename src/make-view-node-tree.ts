@@ -62,7 +62,6 @@ export function buildAtlasDataFromNotionData(notionDataById: NotionDataById) {
   const rawViewNodeMap = buildViewNodeTree(notionDataById);
   const viewNodeMap = addLinkedContentToViewNodes(rawViewNodeMap, slugLookup);
   const viewNodeTreeExtended = makeViewNodeExtendedTreeFromViewNodeMap(viewNodeMap);
-  // TODO: remove extended fields from viewNodeTreeExtended
   const viewNodeTree = makeViewNodeTreeFromViewNodeMap(viewNodeTreeExtended);
   const simplifiedViewNodeTreeTxt =
     makeSimplifiedAtlasData(viewNodeTree).join("\n");
@@ -107,6 +106,7 @@ function buildViewNodeTree(notionDataById: NotionDataById) {
     /* A scope has no ancestor slugs, so its ancestor slug suffixes are an empty array */
     const ancestorSlugSuffixes: string[] = [];
     const globalTags = scopeNotionData.globalTags;
+    const originalContextData = scopeNotionData.originalContextData;
 
     const subDocuments: RawViewNode[] = [];
     const descendantSlugSuffixes: string[] = [];
@@ -131,6 +131,7 @@ function buildViewNodeTree(notionDataById: NotionDataById) {
       subDocuments,
       title,
       globalTags,
+      originalContextData,
     };
 
     newNode.subDocuments = buildSubDocumentsViewTree(
@@ -251,6 +252,7 @@ function buildSubDocumentsViewTree(
     };
 
     const globalTags = subDocument.globalTags;
+    const originalContextData = subDocument.originalContextData;
 
     const newNode: RawViewNode = {
       id,
@@ -264,6 +266,7 @@ function buildSubDocumentsViewTree(
       subDocuments,
       title,
       globalTags,
+      originalContextData,
     };
     newNode.subDocuments = buildSubDocumentsViewTree(
       subDocument,
@@ -293,11 +296,19 @@ function makeViewNodeExtendedTreeFromViewNodeMap(viewNodeMap: ViewNodeMap) {
 
 function makeViewNodeTreeFromViewNodeMap(viewNodeTreeExtended: ViewNodeExtended[]) {
   function filterExtendedNode(node: ViewNodeExtended): ViewNode {
-    const { markdownContent, globalTags, ...rest } = node;
+    const {
+      // do not include these fields
+      markdownContent,
+      globalTags,
+      originalContextData,
+
+      // include these fields
+      ...simplifiedNode
+    } = node;
 
     const viewNode: ViewNode = {
-      ...rest,
-      subDocuments: [...rest.subDocuments.map(filterExtendedNode)],
+      ...simplifiedNode,
+      subDocuments: [...simplifiedNode.subDocuments.map(filterExtendedNode)],
     }
 
     return viewNode;

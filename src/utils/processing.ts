@@ -27,7 +27,6 @@ import {
 } from "../types/index.js";
 import { agentArtifactsSectionId } from "../constants.js";
 import { makeAtlasDataHtmlDocument } from "../components/make-atlas-data-html-string.js";
-import { notionRichTextToMarkdown } from "notion-rich-text-to-markdown";
 
 /**
  * Extracts text content from a title field

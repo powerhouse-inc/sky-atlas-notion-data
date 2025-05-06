@@ -230,8 +230,8 @@ async function makeAtlasData(args: {
   console.log(nodeCountsText);
 
   await writeJsonToFile(`${outputPath}/atlas-data.json`, viewNodeTree);
+  await writeJsonToFile(`${outputPath}/atlas-data-extended.json`, viewNodeTreeExtended);
   await writeJsonToFile(`${outputPath}/view-node-map.json`, viewNodeMap);
-  await writeJsonToFile(`${outputPath}/view-node-tree-extended.json`, viewNodeTreeExtended);
   await writeTxtToFile(`${outputPath}/view-node-counts.txt`, nodeCountsText);
   await writeTxtToFile(`${outputPath}/simplified-atlas-tree.txt`, simplifiedViewNodeTreeTxt);
   // for legacy use

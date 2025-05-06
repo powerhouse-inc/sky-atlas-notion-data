@@ -68,6 +68,7 @@ function processScopes(pages: unknown): TProcessedScopesById {
       ...getRelations(properties["Needed Research"]),
     ];
     const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       type: SCOPE,
@@ -83,6 +84,7 @@ function processScopes(pages: unknown): TProcessedScopesById {
       ],
       children,
       masterStatus: getRelations(properties["Master Status"]),
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -115,6 +117,7 @@ function processArticles(pages: unknown): TProcessedArticlesById {
       content: [{ text: getContentFromRichText(properties.Content) }],
       children,
       masterStatus: getRelations(properties["Master Status"]),
+      originalContextData: getRelations(properties["Original Context Data"]),
       globalTags,
     };
   }
@@ -185,6 +188,7 @@ function processSections(pages: unknown): TProcessedSectionsById {
       masterStatus: getRelations(properties["Master Status"]),
       files: getProcessedFiles(properties["Files & media"]),
       globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
 
@@ -229,6 +233,7 @@ function processAgents(pages: unknown): TProcessedSectionsById {
       masterStatus: getRelations(properties["Master Status"]),
       files: [],
       globalTags,
+      originalContextData: [],
     };
   }
 
@@ -263,6 +268,7 @@ function processAnnotations(pages: unknown): TProcessedAnnotationsById {
       masterStatus: getRelations(properties["Master Status"]),
       children,
       globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -297,6 +303,7 @@ function processTenets(pages: unknown): TProcessedTenetsById {
       children,
       masterStatus: getRelations(properties["Master Status"]),
       globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -344,6 +351,7 @@ function processScenarios(pages: unknown): TProcessedScenariosById {
       masterStatus: getRelations(properties["Master Status"]),
       children,
       globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -392,6 +400,7 @@ function processScenarioVariations(
       masterStatus: getRelations(properties["Master Status"]),
       globalTags,
       children,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -426,6 +435,7 @@ function processNeededResearch(pages: unknown): TProcessedNeededResearchById {
       masterStatus: getRelations(properties["Master Status"]),
       children: [],
       globalTags,
+      originalContextData: []
     };
   }
   return processed;
@@ -457,6 +467,7 @@ function processOriginalContextData(
       masterStatus: getRelations(properties["Master Status"]),
       children: [],
       globalTags,
+      originalContextData: [],
     };
   }
   return processed;
@@ -508,6 +519,7 @@ function processActiveData(pages: unknown): TProcessedActiveDataById {
       masterStatus: getRelations(properties["Master Status"]),
       children,
       globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
