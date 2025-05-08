@@ -77,6 +77,14 @@ export const provisionalMasterStatusId = "3dbb9d9c-fd63-462b-99f3-1ce879f16768";
 export const placeholderMasterStatusId = "3edf54e3-be0e-4bbb-b008-502cfc23394e";
 export const agentArtifactsSectionId = "1b4f2ff0-8d73-8082-862b-dcd586862638";
 
+export const masterStatusesIdMap: Record<string, string> = {
+  [archivedMasterStatusId]: ARCHIVED,
+  [deferredMasterStatusId]: DEFERRED,
+  [approvedMasterStatusId]: APPROVED,
+  [provisionalMasterStatusId]: PROVISIONAL,
+  [placeholderMasterStatusId]: PLACEHOLDER,
+};
+
 export const allowedPageFieldTypes = [
   "title",
   "rich_text",

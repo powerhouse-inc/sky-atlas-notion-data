@@ -8,6 +8,7 @@ export const AnnotationsPageProperties = z.object({
   Content: RichTextField,
   "Needed Research": Relation,
   "Original Context Data": Relation,
+  "Global Tags": Relation,
 });
 
 export const AnnotationsPageSchema = makePageSchema(AnnotationsPageProperties);

@@ -67,6 +67,8 @@ function processScopes(pages: unknown): TProcessedScopesById {
       ...getRelations(properties["Original Context Data"]),
       ...getRelations(properties["Needed Research"]),
     ];
+    const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       type: SCOPE,
@@ -74,6 +76,7 @@ function processScopes(pages: unknown): TProcessedScopesById {
       docNoString,
       name,
       nameString,
+      globalTags,
       content: [
         {
           text: getContentFromRichText(properties.Content),
@@ -81,6 +84,7 @@ function processScopes(pages: unknown): TProcessedScopesById {
       ],
       children,
       masterStatus: getRelations(properties["Master Status"]),
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -97,6 +101,7 @@ function processArticles(pages: unknown): TProcessedArticlesById {
     const docNoString = makeProcessedRichTextString(docNo);
     const name = getContentFromRichText(properties.Name);
     const nameString = makeProcessedRichTextString(name);
+    const globalTags = getRelations(properties["Global Tags"]);
     const children = [
       ...getRelations(properties["Sections & Primary Docs"]),
       ...getRelations(properties["Original Context Data"]),
@@ -112,6 +117,8 @@ function processArticles(pages: unknown): TProcessedArticlesById {
       content: [{ text: getContentFromRichText(properties.Content) }],
       children,
       masterStatus: getRelations(properties["Master Status"]),
+      originalContextData: getRelations(properties["Original Context Data"]),
+      globalTags,
     };
   }
   return processed;
@@ -139,6 +146,7 @@ function processSections(pages: unknown): TProcessedSectionsById {
     const parentArticle = getRelations(properties["Parent Article "]);
     const parentDoc = getRelations(properties["Parent Doc"]);
     const parents = parentDoc.length ? parentDoc : parentArticle;
+    const globalTags = getRelations(properties["Global Tags"]);
 
     processed[id] = {
       id,
@@ -179,6 +187,8 @@ function processSections(pages: unknown): TProcessedSectionsById {
       ],
       masterStatus: getRelations(properties["Master Status"]),
       files: getProcessedFiles(properties["Files & media"]),
+      globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
 
@@ -207,6 +217,7 @@ function processAgents(pages: unknown): TProcessedSectionsById {
     const parents = parentDoc.length
       ? parentDoc
       : [{ id: agentArtifactsSectionId }];
+    const globalTags = getRelations(properties["Global Tags"]);
 
     processed[id] = {
       id,
@@ -221,6 +232,8 @@ function processAgents(pages: unknown): TProcessedSectionsById {
       content: [{ text: getContentFromRichText(properties.Content) }],
       masterStatus: getRelations(properties["Master Status"]),
       files: [],
+      globalTags,
+      originalContextData: [],
     };
   }
 
@@ -242,6 +255,8 @@ function processAnnotations(pages: unknown): TProcessedAnnotationsById {
       ...getRelations(properties["Original Context Data"]),
       ...getRelations(properties["Needed Research"]),
     ];
+    const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       type: ANNOTATION,
@@ -252,6 +267,8 @@ function processAnnotations(pages: unknown): TProcessedAnnotationsById {
       content: [{ text: getContentFromRichText(properties.Content) }],
       masterStatus: getRelations(properties["Master Status"]),
       children,
+      globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -273,6 +290,8 @@ function processTenets(pages: unknown): TProcessedTenetsById {
       ...getRelations(properties["Original Context Data"]),
       ...getRelations(properties["Needed Research"]),
     ];
+    const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       type: TENET,
@@ -283,6 +302,8 @@ function processTenets(pages: unknown): TProcessedTenetsById {
       content: [{ text: getContentFromRichText(properties.Content) }],
       children,
       masterStatus: getRelations(properties["Master Status"]),
+      globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -304,6 +325,8 @@ function processScenarios(pages: unknown): TProcessedScenariosById {
       ...getRelations(properties["Original Context Data"]),
       ...getRelations(properties["Needed Research"]),
     ];
+    const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       type: SCENARIO,
@@ -327,6 +350,8 @@ function processScenarios(pages: unknown): TProcessedScenariosById {
       ],
       masterStatus: getRelations(properties["Master Status"]),
       children,
+      globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -349,6 +374,8 @@ function processScenarioVariations(
       ...getRelations(properties["Original Context Data"]),
       ...getRelations(properties["Needed Research"]),
     ];
+    const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       type: SCENARIO_VARIATION,
@@ -371,7 +398,9 @@ function processScenarioVariations(
         },
       ],
       masterStatus: getRelations(properties["Master Status"]),
+      globalTags,
       children,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;
@@ -388,6 +417,8 @@ function processNeededResearch(pages: unknown): TProcessedNeededResearchById {
     const docNoString = makeProcessedRichTextString(docNo);
     const name = getContentFromRichText(properties.Name);
     const nameString = makeProcessedRichTextString(name);
+    const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       docNo,
@@ -403,6 +434,8 @@ function processNeededResearch(pages: unknown): TProcessedNeededResearchById {
       ],
       masterStatus: getRelations(properties["Master Status"]),
       children: [],
+      globalTags,
+      originalContextData: []
     };
   }
   return processed;
@@ -421,6 +454,8 @@ function processOriginalContextData(
     const nameString = makeProcessedRichTextString(name);
     const docNo = getTextFromTitle(properties["Doc No"]);
     const docNoString = makeProcessedRichTextString(docNo);
+    const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       type: ORIGINAL_CONTEXT_DATA,
@@ -431,6 +466,8 @@ function processOriginalContextData(
       content: [{ text: getContentFromRichText(properties.Content) }],
       masterStatus: getRelations(properties["Master Status"]),
       children: [],
+      globalTags,
+      originalContextData: [],
     };
   }
   return processed;
@@ -469,6 +506,8 @@ function processActiveData(pages: unknown): TProcessedActiveDataById {
       ...getRelations(properties["Original Context Data"]),
       ...getRelations(properties["Needed Research"]),
     ];
+    const globalTags = getRelations(properties["Global Tags"]);
+
     processed[id] = {
       id,
       type: ACTIVE_DATA,
@@ -479,6 +518,8 @@ function processActiveData(pages: unknown): TProcessedActiveDataById {
       content: [{ text: getContentFromRichText(properties.Content) }],
       masterStatus: getRelations(properties["Master Status"]),
       children,
+      globalTags,
+      originalContextData: getRelations(properties["Original Context Data"]),
     };
   }
   return processed;

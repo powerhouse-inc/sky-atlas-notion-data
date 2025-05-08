@@ -12,6 +12,7 @@ export const ScenariosPageProperties = z.object({
   "Needed Research": Relation,
   "Original Context Data": Relation,
   Finding: RichTextField,
+  "Global Tags": Relation,
 });
 
 export const ScenariosPageSchema = makePageSchema(ScenariosPageProperties);

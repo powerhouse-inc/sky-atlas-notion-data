@@ -17,6 +17,7 @@ export const AgentPageProperties = z.object({
   "Needed Research": Relation,
   "Active Data": Relation,
   Annotations: Relation,
+  "Global Tags": Relation,
 });
 
 export const AgentsPageSchema = makePageSchema(AgentPageProperties);

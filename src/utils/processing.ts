@@ -14,6 +14,7 @@ import type {
   TSectionDocType,
   TSupportDocType,
   TProcessedSectionsById,
+  ViewNodeExtended,
 } from "../types/index.js";
 import {
   RelationArray,
@@ -24,7 +25,7 @@ import {
   type TRichTextField,
   type TSelect,
 } from "../types/index.js";
-import { agentArtifactsSectionId } from "../constants.js";
+import { agentArtifactsSectionId, masterStatusesIdMap } from "../constants.js";
 import { makeAtlasDataHtmlDocument } from "../components/make-atlas-data-html-string.js";
 
 /**
@@ -142,6 +143,17 @@ export function getMasterStatusNames(
 }
 
 /**
+ * Gets the master status name from a master status ID
+ * @param {string} masterStatusId - The master status ID
+ * @returns {string | null} The master status name or null if the ID is not found
+ */
+export function getMasterStatusName(masterStatusId?: string): string | null {
+  if (!masterStatusId) return null;
+
+  return masterStatusesIdMap[masterStatusId] ?? null;
+}
+
+/**
  * Extracts IDs from an array of relations
  * @param {any[]} relations - Array of relations
  * @returns {string[]} Array of IDs
@@ -199,7 +211,7 @@ function processRawViewNode(
   slugLookup: Record<string, string>,
   rawViewNodeMap: RawViewNodeMap,
   viewNodeMap: ViewNodeMap,
-): ViewNode {
+): ViewNodeExtended {
   // Avoid processing the same node multiple times
   if (viewNodeMap[node.slugSuffix]) {
     return viewNodeMap[node.slugSuffix]!;
@@ -207,6 +219,10 @@ function processRawViewNode(
 
   // Process content using the updated function
   const content = processContentForViewNode(node, rawViewNodeMap, slugLookup);
+
+  // transform the notion content into markdown
+  // TODO: parse the content into markdown
+  const markdownContent = node.content;
 
   // Recursively process subDocuments
   const subDocuments = node.subDocuments
@@ -217,9 +233,12 @@ function processRawViewNode(
 
   // Create the ViewNode, omitting specified properties and adding processed ones
   const { content: _, subDocuments: __, ...rest } = node;
-  const viewNode: ViewNode = {
+  const viewNode: ViewNodeExtended = {
     ...rest,
     content,
+    // TODO: Implement markdown content
+    // @ts-expect-error
+    markdownContent,
     subDocuments,
   };
 

@@ -1,5 +1,5 @@
 import {
-  getIds, type NotionDataItemsById,
+  getIds, getMasterStatusName, type NotionDataItemsById,
   ProcessedSection
 } from "./index.js";
 import type {
@@ -43,6 +43,9 @@ function makeNotionDataForPage(
       content: processed.content,
       children: getIds(processed.children),
       files: processed.files ?? [],
+      globalTags: (processed.globalTags ?? []).map((tag) => tag.id),
+      originalContextData: getIds(processed.originalContextData),
+      masterStatus: getMasterStatusName(processed.masterStatus?.[0]?.id),
     };
 
     if (ProcessedSection.safeParse(processed).success) {

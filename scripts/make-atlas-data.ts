@@ -222,13 +222,14 @@ async function makeAtlasData(args: {
 
   await writeJsonToFile(`${parsedOutputPath}/notion-data-by-id.json`, notionDataById);
 
-  const { viewNodeTree, viewNodeMap, nodeCountsText, simplifiedViewNodeTreeTxt } =
+  const { viewNodeTree, viewNodeMap, viewNodeTreeExtended, nodeCountsText, simplifiedViewNodeTreeTxt } =
     buildAtlasDataFromNotionData(notionDataById);
 
   console.log('built atlas data from notion data');
   console.log(nodeCountsText);
 
   await writeJsonToFile(`${outputPath}/atlas-data.json`, viewNodeTree);
+  await writeJsonToFile(`${outputPath}/atlas-data-extended.json`, viewNodeTreeExtended);
   await writeJsonToFile(`${outputPath}/view-node-map.json`, viewNodeMap);
   await writeTxtToFile(`${outputPath}/view-node-counts.txt`, nodeCountsText);
   await writeTxtToFile(`${outputPath}/simplified-atlas-tree.txt`, simplifiedViewNodeTreeTxt);

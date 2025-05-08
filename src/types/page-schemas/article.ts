@@ -12,5 +12,6 @@ const ArticlesPageProperties = z.object({
   "Original Context Data": Relation,
   "Sections & Primary Docs": Relation,
   Annotations: Relation,
+  "Global Tags": Relation,
 });
 export const ArticlesPageSchema = makePageSchema(ArticlesPageProperties);
