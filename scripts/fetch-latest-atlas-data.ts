@@ -99,6 +99,12 @@ async function main() {
     console.log(`Successfully fetched view node map data from ${atlasDataUrl}`);
     console.log(`Writing to ${outputPath}/view-node-map.json`);
     await writeFile(`${outputPath}/view-node-map.json`, viewNodeMapData);
+
+    const atlasDataExtendedResponse = await fetch(`${atlasDataUrl}/api/atlas-data-extended`);
+    const atlasDataExtendedData = await atlasDataExtendedResponse.text();
+    console.log(`Successfully fetched atlas data extended from ${atlasDataUrl}`);
+    console.log(`Writing to ${outputPath}/atlas-data-extended.json`);
+    await writeFile(`${outputPath}/atlas-data-extended.json`, atlasDataExtendedData);
   } catch (error) {
     console.error(`Error fetching latest atlas data: `, error);
   }
