@@ -308,10 +308,6 @@ function processContentForViewNode(
     .filter((item) => item !== null && item !== undefined);
 }
 
-function processContentAsMarkdownForViewNode(node: RawViewNode) {
-  return "Working on it";
-}
-
 /**
  * Creates a processed content item from a rich text item
  * 
