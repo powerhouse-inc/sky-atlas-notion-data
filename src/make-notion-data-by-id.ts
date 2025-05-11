@@ -7,6 +7,7 @@ import type {
   ProcessedAtlasPagesById,
   ProcessedAtlasPagesByIdByPageName,
   NotionDataById,
+  TProcessedRichText,
 } from "./types/processed-data.js";
 
 /* Takes all of the notion data and puts it into a map by id.
@@ -41,6 +42,7 @@ function makeNotionDataForPage(
       docNo: processed.docNoString,
       name: processed.nameString,
       content: processed.content,
+      rawContent: processed.rawContent as TProcessedRichText,
       children: getIds(processed.children),
       files: processed.files ?? [],
       globalTags: (processed.globalTags ?? []).map((tag) => tag.id),

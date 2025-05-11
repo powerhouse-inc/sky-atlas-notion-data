@@ -3,6 +3,7 @@ import type {
   TNodeContent,
   TProcessedFile,
   TSectionDocType,
+  TProcessedRichText,
 } from "./processed-data.js";
 
 /**
@@ -17,6 +18,7 @@ export type RawViewNode = {
   type: TDocType;
   title: ViewNodeTitle;
   content: TNodeContent;
+  rawContent: TProcessedRichText;
   slugSuffix: string;
   parentSlugSuffix: string | null;
   ancestorSlugSuffixes: string[];
@@ -33,7 +35,7 @@ export type RawViewNode = {
  * - markdownContent: Markdown content string
  * - globalTags: Global tags
  */
-export type ViewNodeExtended = Omit<RawViewNode, "content" | "subDocuments"> & {
+export type ViewNodeExtended = Omit<RawViewNode, "content" | "subDocuments" | "rawContent"> & {
   content: TProcessedNodeContentItem[];
   subDocuments: ViewNodeExtended[];
   markdownContent: string;
@@ -88,6 +90,7 @@ export type CommonNotionDataProperties = {
   docNo: string;
   name: string;
   content: TNodeContent;
+  rawContent: TProcessedRichText;
   children: string[];
   files: TProcessedFile[];
   globalTags: string[];

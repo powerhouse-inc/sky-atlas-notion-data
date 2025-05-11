@@ -51,7 +51,7 @@ import { camelCase } from "change-case";
 import { type TNotionUniqueId, type TDocType } from "./types/processed-data.js";
 import { AgentsPageSchema } from "./types/page-schemas/agent.js";
 
-function processScopes(pages: unknown): TProcessedScopesById {
+async function processScopes(pages: unknown): Promise<TProcessedScopesById> {
   const scopesPages = ScopesPageSchema.parse(pages);
   const processed: TProcessedScopesById = {};
 
@@ -82,6 +82,7 @@ function processScopes(pages: unknown): TProcessedScopesById {
           text: getContentFromRichText(properties.Content),
         },
       ],
+      rawContent: properties.Content?.rich_text,
       children,
       masterStatus: getRelations(properties["Master Status"]),
       originalContextData: getRelations(properties["Original Context Data"]),
@@ -90,7 +91,7 @@ function processScopes(pages: unknown): TProcessedScopesById {
   return processed;
 }
 
-function processArticles(pages: unknown): TProcessedArticlesById {
+async function processArticles(pages: unknown): Promise<TProcessedArticlesById> {
   const articlesPages = ArticlesPageSchema.parse(pages);
   const processed: TProcessedArticlesById = {};
 
@@ -107,6 +108,7 @@ function processArticles(pages: unknown): TProcessedArticlesById {
       ...getRelations(properties["Original Context Data"]),
       ...getRelations(properties["Needed Research"]),
     ];
+
     processed[id] = {
       id,
       type: ARTICLE,
@@ -115,6 +117,7 @@ function processArticles(pages: unknown): TProcessedArticlesById {
       name,
       nameString,
       content: [{ text: getContentFromRichText(properties.Content) }],
+      rawContent: properties.Content?.rich_text,
       children,
       masterStatus: getRelations(properties["Master Status"]),
       originalContextData: getRelations(properties["Original Context Data"]),
@@ -124,7 +127,7 @@ function processArticles(pages: unknown): TProcessedArticlesById {
   return processed;
 }
 
-function processSections(pages: unknown): TProcessedSectionsById {
+async function processSections(pages: unknown): Promise<TProcessedSectionsById> {
   const sectionsPages = SectionsPageSchema.parse(pages);
   const processed: TProcessedSectionsById = {};
 
@@ -185,6 +188,7 @@ function processSections(pages: unknown): TProcessedSectionsById {
           text: getContentFromRichText(properties["Type Overview"]),
         },
       ],
+      rawContent: properties.Content?.rich_text,
       masterStatus: getRelations(properties["Master Status"]),
       files: getProcessedFiles(properties["Files & media"]),
       globalTags,
@@ -195,7 +199,7 @@ function processSections(pages: unknown): TProcessedSectionsById {
   return processed;
 }
 
-function processAgents(pages: unknown): TProcessedSectionsById {
+async function processAgents(pages: unknown): Promise<TProcessedSectionsById> {
   const agentsPages = AgentsPageSchema.parse(pages);
   const processed: TProcessedSectionsById = {};
 
@@ -230,6 +234,7 @@ function processAgents(pages: unknown): TProcessedSectionsById {
       number: getNumberFromNotionStringFormula(properties["No."]),
       type: camelCase(getTextFromSelect(properties["Doc Type"])) as TDocType,
       content: [{ text: getContentFromRichText(properties.Content) }],
+      rawContent: properties.Content?.rich_text,
       masterStatus: getRelations(properties["Master Status"]),
       files: [],
       globalTags,
@@ -240,7 +245,7 @@ function processAgents(pages: unknown): TProcessedSectionsById {
   return processed;
 }
 
-function processAnnotations(pages: unknown): TProcessedAnnotationsById {
+async function processAnnotations(pages: unknown): Promise<TProcessedAnnotationsById> {
   const annotationsPages = AnnotationsPageSchema.parse(pages);
   const processed: TProcessedAnnotationsById = {};
 
@@ -265,6 +270,7 @@ function processAnnotations(pages: unknown): TProcessedAnnotationsById {
       name,
       nameString,
       content: [{ text: getContentFromRichText(properties.Content) }],
+      rawContent: properties.Content?.rich_text,
       masterStatus: getRelations(properties["Master Status"]),
       children,
       globalTags,
@@ -274,7 +280,7 @@ function processAnnotations(pages: unknown): TProcessedAnnotationsById {
   return processed;
 }
 
-function processTenets(pages: unknown): TProcessedTenetsById {
+async function processTenets(pages: unknown): Promise<TProcessedTenetsById> {
   const tenetsPages = TenetsPageSchema.parse(pages);
   const processed: TProcessedTenetsById = {};
 
@@ -300,6 +306,7 @@ function processTenets(pages: unknown): TProcessedTenetsById {
       name,
       nameString,
       content: [{ text: getContentFromRichText(properties.Content) }],
+      rawContent: properties.Content?.rich_text,
       children,
       masterStatus: getRelations(properties["Master Status"]),
       globalTags,
@@ -309,7 +316,7 @@ function processTenets(pages: unknown): TProcessedTenetsById {
   return processed;
 }
 
-function processScenarios(pages: unknown): TProcessedScenariosById {
+async function processScenarios(pages: unknown): Promise<TProcessedScenariosById> {
   const scenariosPages = ScenariosPageSchema.parse(pages);
   const processed: TProcessedScenariosById = {};
 
@@ -348,6 +355,7 @@ function processScenarios(pages: unknown): TProcessedScenariosById {
           text: getContentFromRichText(properties["Additional Guidance"]),
         },
       ],
+      rawContent: null,
       masterStatus: getRelations(properties["Master Status"]),
       children,
       globalTags,
@@ -357,9 +365,9 @@ function processScenarios(pages: unknown): TProcessedScenariosById {
   return processed;
 }
 
-function processScenarioVariations(
+async function processScenarioVariations(
   pages: unknown,
-): TProcessedScenarioVariationsById {
+): Promise<TProcessedScenarioVariationsById> {
   const scenarioVariationsPages = ScenarioVariationsPageSchema.parse(pages);
   const processed: TProcessedScenarioVariationsById = {};
 
@@ -397,6 +405,7 @@ function processScenarioVariations(
           text: getContentFromRichText(properties["Additional Guidance"]),
         },
       ],
+      rawContent: null,
       masterStatus: getRelations(properties["Master Status"]),
       globalTags,
       children,
@@ -406,7 +415,7 @@ function processScenarioVariations(
   return processed;
 }
 
-function processNeededResearch(pages: unknown): TProcessedNeededResearchById {
+async function processNeededResearch(pages: unknown): Promise<TProcessedNeededResearchById> {
   const neededResearchPages = NeededResearchPageSchema.parse(pages);
   const processed: TProcessedNeededResearchById = {};
 
@@ -432,6 +441,7 @@ function processNeededResearch(pages: unknown): TProcessedNeededResearchById {
           text: getContentFromRichText(properties["Content"]),
         },
       ],
+      rawContent: properties.Content?.rich_text,
       masterStatus: getRelations(properties["Master Status"]),
       children: [],
       globalTags,
@@ -441,9 +451,9 @@ function processNeededResearch(pages: unknown): TProcessedNeededResearchById {
   return processed;
 }
 
-function processOriginalContextData(
+async function processOriginalContextData(
   pages: unknown,
-): TProcessedOriginalContextDataById {
+): Promise<TProcessedOriginalContextDataById> {
   const originalContextDataPages = OriginalContextDataPageSchema.parse(pages);
   const processed: TProcessedOriginalContextDataById = {};
 
@@ -464,6 +474,7 @@ function processOriginalContextData(
       name,
       nameString,
       content: [{ text: getContentFromRichText(properties.Content) }],
+      rawContent: properties.Content?.rich_text,
       masterStatus: getRelations(properties["Master Status"]),
       children: [],
       globalTags,
@@ -473,7 +484,7 @@ function processOriginalContextData(
   return processed;
 }
 
-function processMasterStatus(pages: unknown): TProcessedMasterStatusById {
+async function processMasterStatus(pages: unknown): Promise<TProcessedMasterStatusById> {
   const masterStatusPages = MasterStatusPageSchema.parse(pages);
   const processed: TProcessedMasterStatusById = {};
 
@@ -491,7 +502,7 @@ function processMasterStatus(pages: unknown): TProcessedMasterStatusById {
   return processed;
 }
 
-function processActiveData(pages: unknown): TProcessedActiveDataById {
+async function processActiveData(pages: unknown): Promise<TProcessedActiveDataById> {
   const activeDataPages = ActiveDataPageSchema.parse(pages);
   const processed: TProcessedActiveDataById = {};
 
@@ -516,6 +527,7 @@ function processActiveData(pages: unknown): TProcessedActiveDataById {
       name,
       nameString,
       content: [{ text: getContentFromRichText(properties.Content) }],
+      rawContent: properties.Content?.rich_text,
       masterStatus: getRelations(properties["Master Status"]),
       children,
       globalTags,

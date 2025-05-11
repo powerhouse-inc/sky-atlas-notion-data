@@ -92,7 +92,7 @@ export async function processNotionPage<
   pageName: PageName;
 }): Promise<T> {
   const processor = processors[pageName];
-  const processed = processor(page);
+  const processed = await processor(page);
 
   console.log("processed" + " " + pageName);
 

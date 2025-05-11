@@ -58,9 +58,9 @@ const nodeCounts = {
   [ACTIVE_DATA]: 0,
 };
 
-export function buildAtlasDataFromNotionData(notionDataById: NotionDataById) {
+export async function buildAtlasDataFromNotionData(notionDataById: NotionDataById) {
   const rawViewNodeMap = buildViewNodeTree(notionDataById);
-  const viewNodeMap = addLinkedContentToViewNodes(rawViewNodeMap, slugLookup);
+  const viewNodeMap = await addLinkedContentToViewNodes(rawViewNodeMap, slugLookup);
   const viewNodeTreeExtended = makeViewNodeExtendedTreeFromViewNodeMap(viewNodeMap);
   const viewNodeTree = makeViewNodeTreeFromViewNodeMap(viewNodeTreeExtended);
   const simplifiedViewNodeTreeTxt =
@@ -95,7 +95,7 @@ function buildViewNodeTree(notionDataById: NotionDataById) {
   const firstScopePrefix = sortedScopesNotionData[0].docNo[0];
 
   sortedScopesNotionData.forEach((scopeNotionData, scopeNumber) => {
-    const { id, content, files } = scopeNotionData;
+    const { id, content, rawContent, files } = scopeNotionData;
     /* A scope's number path is always its index only, because scopes are the root nodes of the Atlas view tree */
     const numberPath = [scopeNumber];
     const type = SCOPE;
@@ -124,6 +124,7 @@ function buildViewNodeTree(notionDataById: NotionDataById) {
       id,
       type,
       content,
+      rawContent,
       files,
       slugSuffix,
       parentSlugSuffix,
@@ -184,7 +185,7 @@ function buildSubDocumentsViewTree(
   let counter = startCounter;
 
   sortedSubDocuments.forEach((subDocument, index) => {
-    const { id, type, content, files } = subDocument;
+    const { id, type, content, rawContent, files } = subDocument;
 
     const isAgentArtifact = subDocument.isAgentArtifact === true;
     const isSkyPrimitive = subDocument.isSkyPrimitive === true;
@@ -261,6 +262,7 @@ function buildSubDocumentsViewTree(
       id,
       type,
       content,
+      rawContent,
       files,
       slugSuffix,
       parentSlugSuffix,

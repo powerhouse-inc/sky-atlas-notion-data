@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 import type {
   TFiles,
   TProcessedFile,
@@ -15,7 +15,7 @@ import type {
   TSupportDocType,
   TProcessedSectionsById,
   ViewNodeExtended,
-} from "../types/index.js";
+} from '../types/index.js';
 import {
   RelationArray,
   SectionDocTypeSchema,
@@ -24,9 +24,10 @@ import {
   type TRelation,
   type TRichTextField,
   type TSelect,
-} from "../types/index.js";
-import { agentArtifactsSectionId, masterStatusesIdMap } from "../constants.js";
-import { makeAtlasDataHtmlDocument } from "../components/make-atlas-data-html-string.js";
+} from '../types/index.js';
+import { agentArtifactsSectionId, masterStatusesIdMap } from '../constants.js';
+import { makeAtlasDataHtmlDocument } from '../components/make-atlas-data-html-string.js';
+import { convertToMarkdown } from './markdown-converter.js';
 
 /**
  * Extracts text content from a title field
@@ -44,9 +45,7 @@ export function getTextFromTitle(titleField: TTitleField): TProcessedRichText {
  * @param {TRichTextField} richTextField - The rich text field to process
  * @returns {TProcessedRichText} Filtered array of rich text items
  */
-export function getContentFromRichText(
-  richTextField: TRichTextField,
-): TProcessedRichText {
+export function getContentFromRichText(richTextField: TRichTextField): TProcessedRichText {
   const richText = richTextField?.rich_text ?? [];
   return richText.filter((item) => item !== null && item !== undefined);
 }
@@ -59,7 +58,7 @@ export function getContentFromRichText(
 export function makeProcessedRichTextString(richText: TProcessedRichText) {
   return richText
     .map((item) => item.plain_text)
-    .join(" ")
+    .join(' ')
     .trim();
 }
 
@@ -73,14 +72,14 @@ export function getProcessedFiles(files: TFiles): TProcessedFile[] {
 
   return files.files
     .map((file) => {
-      if (file?.type === "file") {
+      if (file?.type === 'file') {
         if (!file.file?.url) return null;
         return {
           url: file.file.url,
         };
       }
 
-      if (file?.type === "external") {
+      if (file?.type === 'external') {
         if (!file.external?.url) return null;
         return {
           url: file.external.url,
@@ -106,8 +105,7 @@ export function getRelations(relation: TRelation) {
     return [];
   }
 
-  return (result.data?.filter((r) => Boolean(r?.id)) ??
-    []) as TProcessedRelations;
+  return (result.data?.filter((r) => Boolean(r?.id)) ?? []) as TProcessedRelations;
 }
 
 /**
@@ -116,7 +114,7 @@ export function getRelations(relation: TRelation) {
  * @returns {string} The selected value's name
  */
 export function getTextFromSelect(select: TSelect) {
-  return select?.select?.name ?? "";
+  return select?.select?.name ?? '';
 }
 
 /**
@@ -137,7 +135,7 @@ export function makeSchemaById<TSchema extends z.ZodTypeAny>(schema: TSchema) {
  */
 export function getMasterStatusNames(
   masterStatusIds: string[],
-  parsedMasterStatus: Record<string, string>,
+  parsedMasterStatus: Record<string, string>
 ): string[] {
   return masterStatusIds.map((id) => parsedMasterStatus[id]);
 }
@@ -168,7 +166,7 @@ export function getIds(relations: any[]): string[] {
  * @param {ViewNodeMap} viewNodeMap - Map of view nodes
  * @returns {Promise<Record<string, string>>} Map of node IDs to HTML strings
  */
-export async function makeHtmlDocumentViewNodeMap(viewNodeMap:  ViewNodeMap) {
+export async function makeHtmlDocumentViewNodeMap(viewNodeMap: ViewNodeMap) {
   const htmlStringViewNodeMap: Record<string, string> = {};
   for (const slugSuffix in viewNodeMap) {
     const viewNode = viewNodeMap[slugSuffix]!;
@@ -184,15 +182,15 @@ export async function makeHtmlDocumentViewNodeMap(viewNodeMap:  ViewNodeMap) {
  * @param {ViewNodeMap} [viewNodeMap={}] - Optional existing view node map to update
  * @returns {ViewNodeMap} Processed view node map
  */
-export function processRawViewNodeMap(
+export async function processRawViewNodeMap(
   rawViewNodeMap: RawViewNodeMap,
   slugLookup: Record<string, string>,
-  viewNodeMap: ViewNodeMap = {},
-): ViewNodeMap {
+  viewNodeMap: ViewNodeMap = {}
+): Promise<ViewNodeMap> {
   for (const slugSuffix in rawViewNodeMap) {
     const rawNode = rawViewNodeMap[slugSuffix];
     if (rawNode) {
-      processRawViewNode(rawNode, slugLookup, rawViewNodeMap, viewNodeMap);
+      await processRawViewNode(rawNode, slugLookup, rawViewNodeMap, viewNodeMap);
     }
   }
   return viewNodeMap;
@@ -206,12 +204,12 @@ export function processRawViewNodeMap(
  * @param {ViewNodeMap} viewNodeMap - View node map to update
  * @returns {ViewNode} Processed view node
  */
-function processRawViewNode(
+async function processRawViewNode(
   node: RawViewNode,
   slugLookup: Record<string, string>,
   rawViewNodeMap: RawViewNodeMap,
-  viewNodeMap: ViewNodeMap,
-): ViewNodeExtended {
+  viewNodeMap: ViewNodeMap
+): Promise<ViewNodeExtended> {
   // Avoid processing the same node multiple times
   if (viewNodeMap[node.slugSuffix]) {
     return viewNodeMap[node.slugSuffix]!;
@@ -219,27 +217,29 @@ function processRawViewNode(
 
   // Process content using the updated function
   const content = processContentForViewNode(node, rawViewNodeMap, slugLookup);
-
-  // transform the notion content into markdown
-  // TODO: parse the content into markdown
-  const markdownContent = node.content;
+  const markdownContent = await processMarkdownContentForViewNode(node, rawViewNodeMap, slugLookup);
 
   // Recursively process subDocuments
-  const subDocuments = node.subDocuments
-    ? node.subDocuments.map((subNode) =>
-        processRawViewNode(subNode, slugLookup, rawViewNodeMap, viewNodeMap),
-      )
-    : [];
+  const subDocuments: ViewNodeExtended[] = [];
+  if (node.subDocuments) {
+    for (const subNode of node.subDocuments) {
+      const processedSubNode = await processRawViewNode(
+        subNode,
+        slugLookup,
+        rawViewNodeMap,
+        viewNodeMap
+      );
+      subDocuments.push(processedSubNode);
+    }
+  }
 
   // Create the ViewNode, omitting specified properties and adding processed ones
   const { content: _, subDocuments: __, ...rest } = node;
   const viewNode: ViewNodeExtended = {
     ...rest,
     content,
-    // TODO: Implement markdown content
-    // @ts-expect-error
-    markdownContent,
     subDocuments,
+    markdownContent,
   };
 
   // Add the processed node to the map
@@ -250,18 +250,18 @@ function processRawViewNode(
 
 /**
  * Processes content for a view node, including handling links and mentions
- * 
+ *
  * This function processes the raw content of a view node, with special handling for:
  * - Links to other nodes (both internal and external)
  * - Mentions of other nodes
  * - Equations, code blocks, and tables
  * - Regular paragraphs
- * 
+ *
  * For links and mentions, it:
  * 1. Extracts the target node ID from the URL or mention
  * 2. Looks up the target node in the view node map
  * 3. Creates a processed link/mention with the correct numbering and title
- * 
+ *
  * @param {RawViewNode} node - Node to process content for
  * @param {RawViewNodeMap} rawViewNodeMap - Raw view node map
  * @param {Record<string, string>} slugLookup - Lookup table for slugs
@@ -270,7 +270,7 @@ function processRawViewNode(
 function processContentForViewNode(
   node: RawViewNode,
   rawViewNodeMap: RawViewNodeMap,
-  slugLookup: Record<string, string>,
+  slugLookup: Record<string, string>
 ): TProcessedNodeContentItem[] {
   return node.content
     .map((contentItem) => {
@@ -280,18 +280,16 @@ function processContentForViewNode(
       let processedText: TProcessedViewNodeContent[] = [];
 
       // Process the 'text' field
-      if (typeof contentItem.text === "string") {
+      if (typeof contentItem.text === 'string') {
         if (contentItem.text.length > 0) {
           processedText.push({
-            type: "paragraphs",
+            type: 'paragraphs',
             text: contentItem.text,
           });
         }
       } else if (Array.isArray(contentItem.text)) {
         processedText = contentItem.text
-          .map((item) =>
-            makeProcessedContentItem(item, rawViewNodeMap, slugLookup),
-          )
+          .map((item) => makeProcessedContentItem(item, rawViewNodeMap, slugLookup))
           .filter(Boolean) as TProcessedViewNodeContent[];
       }
 
@@ -310,20 +308,20 @@ function processContentForViewNode(
 
 /**
  * Creates a processed content item from a rich text item
- * 
+ *
  * This function handles the conversion of raw rich text items into processed content,
  * with special handling for different content types:
- * 
+ *
  * - Mentions: Converts Notion mentions to links with correct numbering
  * - Links: Processes both internal and external links
  * - Equations: Preserves equation content
  * - Code: Preserves code content with formatting
  * - Tables: Preserves table content
  * - Paragraphs: Handles regular text content
- * 
+ *
  * For links and mentions, it ensures the correct numbering is used by looking up
  * the target node in the view node map and using its processed title.
- * 
+ *
  * @param {TProcessedRichTextItem} richTextItem - Rich text item to process
  * @param {RawViewNodeMap} viewNodeMap - View node map for looking up target nodes
  * @param {Record<string, string>} slugLookup - Lookup table for slugs
@@ -332,10 +330,10 @@ function processContentForViewNode(
 function makeProcessedContentItem(
   richTextItem: TProcessedRichTextItem,
   viewNodeMap: RawViewNodeMap,
-  slugLookup: Record<string, string>,
+  slugLookup: Record<string, string>
 ): TProcessedViewNodeContent | null {
   if (
-    richTextItem.type === "mention" &&
+    richTextItem.type === 'mention' &&
     richTextItem.mention?.page?.id &&
     richTextItem.plain_text?.length
   ) {
@@ -344,12 +342,12 @@ function makeProcessedContentItem(
       richTextItem.plain_text,
       richTextItem.text?.link?.url,
       viewNodeMap,
-      slugLookup,
+      slugLookup
     );
   }
 
   if (
-    richTextItem.type === "text" &&
+    richTextItem.type === 'text' &&
     richTextItem.text?.link?.url &&
     richTextItem.plain_text?.length
   ) {
@@ -357,11 +355,11 @@ function makeProcessedContentItem(
       richTextItem.text?.link?.url,
       richTextItem.plain_text,
       viewNodeMap,
-      slugLookup,
+      slugLookup
     );
   }
 
-  if (richTextItem.type === "equation" && richTextItem.plain_text?.length) {
+  if (richTextItem.type === 'equation' && richTextItem.plain_text?.length) {
     return makeEquationContent(richTextItem.plain_text);
   }
 
@@ -369,10 +367,7 @@ function makeProcessedContentItem(
     return makeCodeContent(richTextItem.plain_text);
   }
 
-  if (
-    richTextItem.plain_text?.includes("----") &&
-    richTextItem.plain_text?.length
-  ) {
+  if (richTextItem.plain_text?.includes('----') && richTextItem.plain_text?.length) {
     return makeTableContent(richTextItem.plain_text);
   }
 
@@ -384,13 +379,59 @@ function makeProcessedContentItem(
 }
 
 /**
+ * Processes the raw content of a view node into a markdown string
+ *
+ * @param {RawViewNode} node - Node to process raw content for
+ * @returns {Promise<string>} Markdown string
+ */
+async function processMarkdownContentForViewNode(
+  node: RawViewNode,
+  rawViewNodeMap: RawViewNodeMap,
+  slugLookup: Record<string, string>
+): Promise<string> {
+  const richText = node.rawContent;
+  if (!richText) {
+    return '';
+  }
+
+  const processedRichText = richText.map((item) => {
+    if (item.type === 'mention') {
+      const pageId = item.mention?.page?.id;
+      const slug = getSlugWithSuffix(pageId ?? '', slugLookup);
+      const node = rawViewNodeMap[slug];
+
+      if (node) {
+        const text = `[${makeViewNodeTitleText(node)}](${makeViewNodeUrl(node)})`;
+
+        return {
+          type: "text" as const,
+          text: {
+            content: text,
+            link: null,
+          },
+          annotations: {
+            ...item.annotations,
+          },
+          plain_text: text,
+          href: null,
+        };
+      }
+    }
+
+    return item;
+  });
+
+  return await convertToMarkdown(processedRichText);
+}
+
+/**
  * Creates a paragraphs content item
  * @param {string} text - Text content
  * @returns {TProcessedViewNodeContent} Paragraphs content item
  */
 function makeParagraphsContent(text: string) {
   return {
-    type: "paragraphs",
+    type: 'paragraphs',
     text,
   } as const;
 }
@@ -402,7 +443,7 @@ function makeParagraphsContent(text: string) {
  */
 function makeCodeContent(text: string) {
   return {
-    type: "code",
+    type: 'code',
     text,
   } as const;
 }
@@ -414,7 +455,7 @@ function makeCodeContent(text: string) {
  */
 function makeTableContent(text: string) {
   return {
-    type: "table",
+    type: 'table',
     text,
   } as const;
 }
@@ -426,23 +467,23 @@ function makeTableContent(text: string) {
  */
 function makeEquationContent(text: string) {
   return {
-    type: "equation",
+    type: 'equation',
     text,
   } as const;
 }
 
 /**
  * Creates a link content item
- * 
+ *
  * Processes a link to either:
  * 1. An internal node (using the processed node's title and URL)
  * 2. An external URL (preserving the original link)
- * 
+ *
  * For internal links, it:
  * 1. Extracts the target node ID from the URL
  * 2. Looks up the target node in the view node map
  * 3. Uses the processed node's title and URL
- * 
+ *
  * @param {string} href - Link URL
  * @param {string} text - Link text
  * @param {RawViewNodeMap} viewNodeMap - View node map for looking up target nodes
@@ -453,10 +494,10 @@ function makeLinkContent(
   href: string,
   text: string,
   viewNodeMap: RawViewNodeMap,
-  slugLookup: Record<string, string>,
+  slugLookup: Record<string, string>
 ) {
   const pageIdFromUrl = formatNotionIdFromUrl(href);
-  const slug = getSlugWithSuffix(pageIdFromUrl ?? "", slugLookup);
+  const slug = getSlugWithSuffix(pageIdFromUrl ?? '', slugLookup);
   const node = viewNodeMap[slug];
 
   if (node) {
@@ -464,7 +505,7 @@ function makeLinkContent(
     const title = makeViewNodeTitleText(node);
 
     return {
-      type: "link",
+      type: 'link',
       text: title,
       href,
       external: false,
@@ -472,7 +513,7 @@ function makeLinkContent(
   }
 
   return {
-    type: "link",
+    type: 'link',
     text,
     href,
     external: true,
@@ -481,12 +522,12 @@ function makeLinkContent(
 
 /**
  * Creates a mention content item
- * 
+ *
  * Processes a Notion mention to:
  * 1. Look up the mentioned node in the view node map
  * 2. Use the processed node's title and URL
  * 3. Fall back to the original text and URL if the node isn't found
- * 
+ *
  * @param {string} id - Mentioned page ID
  * @param {string} text - Mention text
  * @param {string | null | undefined} url - Mention URL
@@ -499,14 +540,14 @@ function makeMentionContent(
   text: string,
   url: string | null | undefined,
   viewNodeMap: RawViewNodeMap,
-  slugLookup: Record<string, string>,
+  slugLookup: Record<string, string>
 ) {
   const slugWithSuffix = getSlugWithSuffix(id, slugLookup);
   const node = viewNodeMap[slugWithSuffix];
-  const href = node ? makeViewNodeUrl(node) : (url ?? "");
+  const href = node ? makeViewNodeUrl(node) : (url ?? '');
   const title = node ? makeViewNodeTitleText(node) : text;
   return {
-    type: "mention",
+    type: 'mention',
     text: title,
     href,
   } as const;
@@ -518,10 +559,7 @@ function makeMentionContent(
  * @param {Record<string, string>} slugLookup - Lookup table for slugs
  * @returns {string} Slug with suffix
  */
-export function getSlugWithSuffix(
-  id: string,
-  slugLookup: Record<string, string>,
-) {
+export function getSlugWithSuffix(id: string, slugLookup: Record<string, string>) {
   const slugFromLookup = slugLookup[id];
   const hasSlugFromLookup = !!slugFromLookup;
 
@@ -548,7 +586,7 @@ export function makeViewNodeUrl(node: ViewNode | RawViewNode) {
  * @returns {string} Title slug
  */
 export function makeViewNodeTitleSlug(node: ViewNode | RawViewNode) {
-  return makeViewNodeTitleText(node).replaceAll(/[- _/]+/g, "_");
+  return makeViewNodeTitleText(node).replaceAll(/[- _/]+/g, '_');
 }
 
 /**
@@ -559,8 +597,8 @@ export function makeViewNodeTitleSlug(node: ViewNode | RawViewNode) {
 export function makeViewNodeTitleText(node: ViewNode | RawViewNode): string {
   const { formalId, title, typeSuffix } = node.title;
   const { prefix, numberPath } = formalId;
-  const path = [prefix, ...numberPath].join(".");
-  const typeSuffixString = typeSuffix ? ` - ${typeSuffix}` : "";
+  const path = [prefix, ...numberPath].join('.');
+  const typeSuffixString = typeSuffix ? ` - ${typeSuffix}` : '';
 
   return `${path} - ${title}${typeSuffixString}`;
 }
@@ -570,9 +608,7 @@ export function makeViewNodeTitleText(node: ViewNode | RawViewNode): string {
  * @param {string | null | undefined} url - URL to extract ID from
  * @returns {string | null} Extracted ID or null
  */
-export function formatNotionIdFromUrl(
-  url: string | null | undefined,
-): string | null {
+export function formatNotionIdFromUrl(url: string | null | undefined): string | null {
   if (!url) {
     return null;
   }
@@ -597,12 +633,12 @@ export function formatNotionIdFromUrl(
  */
 export function formatUUID(uuid: string): string {
   if (uuid.length !== 32) {
-    throw new Error("Invalid UUID string length");
+    throw new Error('Invalid UUID string length');
   }
 
   return `${uuid.substring(0, 8)}-${uuid.substring(8, 12)}-${uuid.substring(
     12,
-    16,
+    16
   )}-${uuid.substring(16, 20)}-${uuid.substring(20)}`;
 }
 
@@ -614,7 +650,7 @@ export function formatUUID(uuid: string): string {
 export function makeViewNodeAtlasId(node: ViewNode) {
   const { formalId } = node.title;
   const { prefix, numberPath } = formalId;
-  return `${prefix}.${numberPath.join(".")}`;
+  return `${prefix}.${numberPath.join('.')}`;
 }
 
 /**
@@ -664,35 +700,31 @@ export function getNonSupportDocs(node: ViewNode) {
 
 /**
  * Processes agent-related sections from the agents database
- * 
+ *
  * The agents database contains sections that follow special naming and numbering rules.
  * This function:
  * 1. Identifies agent artifacts and sky primitives
  * 2. Updates section relationships
  * 3. Adds special flags to sections
- * 
+ *
  * @param {TProcessedSectionsById} processedSectionsById - Processed sections from main database
  * @param {TProcessedSectionsById} processedAgentsById - Processed sections from agents database
  * @returns {TProcessedSectionsById} Combined and processed sections
  */
 export function handleAgents(
   processedSectionsById: TProcessedSectionsById,
-  processedAgentsById: TProcessedSectionsById,
+  processedAgentsById: TProcessedSectionsById
 ) {
   const agents = Object.values(processedAgentsById);
   const agentArtifactIds = agents
-    .filter((page) =>
-      page.parents.some((parent) => parent.id === agentArtifactsSectionId),
-    )
+    .filter((page) => page.parents.some((parent) => parent.id === agentArtifactsSectionId))
     .map((page) => page.id);
   const listsOfSkyPrimitiveListsIds = agents
-    .filter((agent) => agent.nameString.toLowerCase() === "sky primitives")
+    .filter((agent) => agent.nameString.toLowerCase() === 'sky primitives')
     .map((page) => page.id);
   const skyPrimitiveListIds = agents
     .filter((agent) =>
-      agent.parents.some((parent) =>
-        listsOfSkyPrimitiveListsIds.includes(parent.id),
-      ),
+      agent.parents.some((parent) => listsOfSkyPrimitiveListsIds.includes(parent.id))
     )
     .map((page) => page.id);
 
@@ -707,7 +739,7 @@ export function handleAgents(
     }
     section.isAgentArtifact = agentArtifactIds.includes(section.id);
     section.isSkyPrimitive = section.parents.some((parent) =>
-      skyPrimitiveListIds.includes(parent.id),
+      skyPrimitiveListIds.includes(parent.id)
     );
   }
 

@@ -153,7 +153,7 @@ async function makeAtlasData(args: {
 
     // Check if required Notion page files exist
     const requiredNotionFiles = [
-      `${notionPagesOutputPath}/${MASTER_STATUS}.json`,
+      //`${notionPagesOutputPath}/${MASTER_STATUS}.json`,
     ];
 
     // Add Atlas page files to required files
@@ -223,7 +223,7 @@ async function makeAtlasData(args: {
   await writeJsonToFile(`${parsedOutputPath}/notion-data-by-id.json`, notionDataById);
 
   const { viewNodeTree, viewNodeMap, viewNodeTreeExtended, nodeCountsText, simplifiedViewNodeTreeTxt } =
-    buildAtlasDataFromNotionData(notionDataById);
+    await buildAtlasDataFromNotionData(notionDataById);
 
   console.log('built atlas data from notion data');
   console.log(nodeCountsText);
