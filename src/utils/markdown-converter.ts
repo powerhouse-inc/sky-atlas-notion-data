@@ -4,12 +4,6 @@ import type { TProcessedRichText } from "../types/processed-data.js";
 export async function convertToMarkdown(richText: TProcessedRichText): Promise<string> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const n2m = new NotionToMarkdown({} as any);
-    
-    for (const node of richText) {
-        if (node?.type === "mention") {
-            const x = 0;
-        }
-    }
 
     return await n2m.blockToMarkdown({
         type: "paragraph",
