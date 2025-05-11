@@ -153,7 +153,7 @@ async function makeAtlasData(args: {
 
     // Check if required Notion page files exist
     const requiredNotionFiles = [
-      //`${notionPagesOutputPath}/${MASTER_STATUS}.json`,
+      `${notionPagesOutputPath}/${MASTER_STATUS}.json`,
     ];
 
     // Add Atlas page files to required files
