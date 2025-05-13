@@ -51,7 +51,7 @@ import { camelCase } from "change-case";
 import { type TNotionUniqueId, type TDocType } from "./types/processed-data.js";
 import { AgentsPageSchema } from "./types/page-schemas/agent.js";
 
-async function processScopes(pages: unknown): Promise<TProcessedScopesById> {
+function processScopes(pages: unknown): TProcessedScopesById {
   const scopesPages = ScopesPageSchema.parse(pages);
   const processed: TProcessedScopesById = {};
 
@@ -91,7 +91,7 @@ async function processScopes(pages: unknown): Promise<TProcessedScopesById> {
   return processed;
 }
 
-async function processArticles(pages: unknown): Promise<TProcessedArticlesById> {
+function processArticles(pages: unknown): TProcessedArticlesById {
   const articlesPages = ArticlesPageSchema.parse(pages);
   const processed: TProcessedArticlesById = {};
 
@@ -127,7 +127,7 @@ async function processArticles(pages: unknown): Promise<TProcessedArticlesById> 
   return processed;
 }
 
-async function processSections(pages: unknown): Promise<TProcessedSectionsById> {
+function processSections(pages: unknown): TProcessedSectionsById {
   const sectionsPages = SectionsPageSchema.parse(pages);
   const processed: TProcessedSectionsById = {};
 
@@ -199,7 +199,7 @@ async function processSections(pages: unknown): Promise<TProcessedSectionsById> 
   return processed;
 }
 
-async function processAgents(pages: unknown): Promise<TProcessedSectionsById> {
+function processAgents(pages: unknown): TProcessedSectionsById {
   const agentsPages = AgentsPageSchema.parse(pages);
   const processed: TProcessedSectionsById = {};
 
@@ -245,7 +245,7 @@ async function processAgents(pages: unknown): Promise<TProcessedSectionsById> {
   return processed;
 }
 
-async function processAnnotations(pages: unknown): Promise<TProcessedAnnotationsById> {
+function processAnnotations(pages: unknown): TProcessedAnnotationsById {
   const annotationsPages = AnnotationsPageSchema.parse(pages);
   const processed: TProcessedAnnotationsById = {};
 
@@ -280,7 +280,7 @@ async function processAnnotations(pages: unknown): Promise<TProcessedAnnotations
   return processed;
 }
 
-async function processTenets(pages: unknown): Promise<TProcessedTenetsById> {
+function processTenets(pages: unknown): TProcessedTenetsById {
   const tenetsPages = TenetsPageSchema.parse(pages);
   const processed: TProcessedTenetsById = {};
 
@@ -316,7 +316,7 @@ async function processTenets(pages: unknown): Promise<TProcessedTenetsById> {
   return processed;
 }
 
-async function processScenarios(pages: unknown): Promise<TProcessedScenariosById> {
+function processScenarios(pages: unknown): TProcessedScenariosById {
   const scenariosPages = ScenariosPageSchema.parse(pages);
   const processed: TProcessedScenariosById = {};
 
@@ -365,9 +365,9 @@ async function processScenarios(pages: unknown): Promise<TProcessedScenariosById
   return processed;
 }
 
-async function processScenarioVariations(
+function processScenarioVariations(
   pages: unknown,
-): Promise<TProcessedScenarioVariationsById> {
+): TProcessedScenarioVariationsById {
   const scenarioVariationsPages = ScenarioVariationsPageSchema.parse(pages);
   const processed: TProcessedScenarioVariationsById = {};
 
@@ -415,7 +415,7 @@ async function processScenarioVariations(
   return processed;
 }
 
-async function processNeededResearch(pages: unknown): Promise<TProcessedNeededResearchById> {
+function processNeededResearch(pages: unknown): TProcessedNeededResearchById {
   const neededResearchPages = NeededResearchPageSchema.parse(pages);
   const processed: TProcessedNeededResearchById = {};
 
@@ -451,9 +451,9 @@ async function processNeededResearch(pages: unknown): Promise<TProcessedNeededRe
   return processed;
 }
 
-async function processOriginalContextData(
+function processOriginalContextData(
   pages: unknown,
-): Promise<TProcessedOriginalContextDataById> {
+): TProcessedOriginalContextDataById {
   const originalContextDataPages = OriginalContextDataPageSchema.parse(pages);
   const processed: TProcessedOriginalContextDataById = {};
 
@@ -484,7 +484,7 @@ async function processOriginalContextData(
   return processed;
 }
 
-async function processMasterStatus(pages: unknown): Promise<TProcessedMasterStatusById> {
+function processMasterStatus(pages: unknown): TProcessedMasterStatusById {
   const masterStatusPages = MasterStatusPageSchema.parse(pages);
   const processed: TProcessedMasterStatusById = {};
 
@@ -502,7 +502,7 @@ async function processMasterStatus(pages: unknown): Promise<TProcessedMasterStat
   return processed;
 }
 
-async function processActiveData(pages: unknown): Promise<TProcessedActiveDataById> {
+function processActiveData(pages: unknown): TProcessedActiveDataById {
   const activeDataPages = ActiveDataPageSchema.parse(pages);
   const processed: TProcessedActiveDataById = {};
 

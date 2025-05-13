@@ -390,13 +390,13 @@ async function processMarkdownContentForViewNode(
   slugLookup: Record<string, string>
 ): Promise<string> {
   const richText = node.rawContent;
-  if (!richText) {
+  if (!richText || !Array.isArray(richText)) {
     return '';
   }
 
-  const processedRichText = richText.map((item) => {
+  const processedRichText = (richText as TProcessedRichText).map((item) => {
     if (item.type === 'mention') {
-      const pageId = item.mention?.page?.id;
+      const pageId = item?.mention?.page?.id;
       const slug = getSlugWithSuffix(pageId ?? '', slugLookup);
       const node = rawViewNodeMap[slug];
 

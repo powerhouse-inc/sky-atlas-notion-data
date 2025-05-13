@@ -18,7 +18,7 @@ export type RawViewNode = {
   type: TDocType;
   title: ViewNodeTitle;
   content: TNodeContent;
-  rawContent: TProcessedRichText;
+  rawContent: unknown;
   slugSuffix: string;
   parentSlugSuffix: string | null;
   ancestorSlugSuffixes: string[];
@@ -90,7 +90,7 @@ export type CommonNotionDataProperties = {
   docNo: string;
   name: string;
   content: TNodeContent;
-  rawContent: TProcessedRichText;
+  rawContent: unknown;
   children: string[];
   files: TProcessedFile[];
   globalTags: string[];

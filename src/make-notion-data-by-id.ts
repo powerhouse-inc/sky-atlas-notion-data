@@ -42,7 +42,7 @@ function makeNotionDataForPage(
       docNo: processed.docNoString,
       name: processed.nameString,
       content: processed.content,
-      rawContent: processed.rawContent as TProcessedRichText,
+      rawContent: processed.rawContent,
       children: getIds(processed.children),
       files: processed.files ?? [],
       globalTags: (processed.globalTags ?? []).map((tag) => tag.id),

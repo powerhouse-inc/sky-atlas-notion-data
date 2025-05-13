@@ -6,7 +6,6 @@ import {
   makeNotionDataById,
   MASTER_STATUS,
   processAtlasNotionPages,
-  processNotionPage,
   buildAtlasDataFromNotionData,
   type TProcessedSectionsById,
   type ViewNodeMap,
@@ -198,7 +197,7 @@ async function makeAtlasData(args: {
     }
   }
 
-  const processedAtlasPagesByIdByPageName = await processAtlasNotionPages(
+  const processedAtlasPagesByIdByPageName = processAtlasNotionPages(
     fetchAtlasNotionPagesResult
   );
 
