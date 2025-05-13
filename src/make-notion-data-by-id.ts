@@ -1,3 +1,4 @@
+import { type RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints.js";
 import {
   getIds, getMasterStatusName, type NotionDataItemsById,
   ProcessedSection
@@ -42,7 +43,7 @@ function makeNotionDataForPage(
       docNo: processed.docNoString,
       name: processed.nameString,
       content: processed.content,
-      rawContent: processed.rawContent,
+      rawContent: processed.rawContent as RichTextItemResponse[],
       children: getIds(processed.children),
       files: processed.files ?? [],
       globalTags: (processed.globalTags ?? []).map((tag) => tag.id),

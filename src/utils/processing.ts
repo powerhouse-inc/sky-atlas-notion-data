@@ -28,6 +28,7 @@ import {
 import { agentArtifactsSectionId, masterStatusesIdMap } from '../constants.js';
 import { makeAtlasDataHtmlDocument } from '../components/make-atlas-data-html-string.js';
 import { convertToMarkdown } from './markdown-converter.js';
+import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints.js';
 
 /**
  * Extracts text content from a title field
@@ -394,11 +395,15 @@ async function processMarkdownContentForViewNode(
     return '';
   }
 
-  const processedRichText = (richText as TProcessedRichText).map((item) => {
+  const processedRichText = (richText).map((item: RichTextItemResponse) => {
     if (item.type === 'mention') {
-      const pageId = item?.mention?.page?.id;
-      const slug = getSlugWithSuffix(pageId ?? '', slugLookup);
-      const node = rawViewNodeMap[slug];
+      let node;
+
+      if (item.mention.type === 'page') {
+        const pageId = item.mention.page.id;
+        const slug = getSlugWithSuffix(pageId ?? '', slugLookup);
+        node = rawViewNodeMap[slug];
+      }
 
       if (node) {
         const text = `[${makeViewNodeTitleText(node)}](${makeViewNodeUrl(node)})`;

@@ -1,3 +1,4 @@
+import type { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints.js";
 import type {
   TDocType,
   TNodeContent,
@@ -18,7 +19,7 @@ export type RawViewNode = {
   type: TDocType;
   title: ViewNodeTitle;
   content: TNodeContent;
-  rawContent: unknown;
+  rawContent: RichTextItemResponse[];
   slugSuffix: string;
   parentSlugSuffix: string | null;
   ancestorSlugSuffixes: string[];
@@ -90,7 +91,7 @@ export type CommonNotionDataProperties = {
   docNo: string;
   name: string;
   content: TNodeContent;
-  rawContent: unknown;
+  rawContent: RichTextItemResponse[];
   children: string[];
   files: TProcessedFile[];
   globalTags: string[];
