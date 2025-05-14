@@ -6,7 +6,6 @@ import {
   makeNotionDataById,
   MASTER_STATUS,
   processAtlasNotionPages,
-  processNotionPage,
   buildAtlasDataFromNotionData,
   type TProcessedSectionsById,
   type ViewNodeMap,
@@ -198,7 +197,7 @@ async function makeAtlasData(args: {
     }
   }
 
-  const processedAtlasPagesByIdByPageName = await processAtlasNotionPages(
+  const processedAtlasPagesByIdByPageName = processAtlasNotionPages(
     fetchAtlasNotionPagesResult
   );
 
@@ -223,7 +222,7 @@ async function makeAtlasData(args: {
   await writeJsonToFile(`${parsedOutputPath}/notion-data-by-id.json`, notionDataById);
 
   const { viewNodeTree, viewNodeMap, viewNodeTreeExtended, nodeCountsText, simplifiedViewNodeTreeTxt } =
-    buildAtlasDataFromNotionData(notionDataById);
+    await buildAtlasDataFromNotionData(notionDataById);
 
   console.log('built atlas data from notion data');
   console.log(nodeCountsText);

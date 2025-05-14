@@ -1,8 +1,10 @@
+import type { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints.js";
 import type {
   TDocType,
   TNodeContent,
   TProcessedFile,
   TSectionDocType,
+  TProcessedRichText,
 } from "./processed-data.js";
 
 /**
@@ -17,6 +19,7 @@ export type RawViewNode = {
   type: TDocType;
   title: ViewNodeTitle;
   content: TNodeContent;
+  rawContent: RichTextItemResponse[];
   slugSuffix: string;
   parentSlugSuffix: string | null;
   ancestorSlugSuffixes: string[];
@@ -33,7 +36,7 @@ export type RawViewNode = {
  * - markdownContent: Markdown content string
  * - globalTags: Global tags
  */
-export type ViewNodeExtended = Omit<RawViewNode, "content" | "subDocuments"> & {
+export type ViewNodeExtended = Omit<RawViewNode, "content" | "subDocuments" | "rawContent"> & {
   content: TProcessedNodeContentItem[];
   subDocuments: ViewNodeExtended[];
   markdownContent: string;
@@ -88,6 +91,7 @@ export type CommonNotionDataProperties = {
   docNo: string;
   name: string;
   content: TNodeContent;
+  rawContent: RichTextItemResponse[];
   children: string[];
   files: TProcessedFile[];
   globalTags: string[];

@@ -82,7 +82,7 @@ export async function getNotionPage(args: {
  * Processes a Notion page using the appropriate processor
  * Applies the page-specific transformation logic to convert raw Notion data
  */
-export async function processNotionPage<
+function processNotionPage<
   T extends ProcessedPagesById = ProcessedPagesById,
 >({
   page,
@@ -90,7 +90,7 @@ export async function processNotionPage<
 }: {
   page: NotionDatabaseQueryResponse[];
   pageName: PageName;
-}): Promise<T> {
+}): T {
   const processor = processors[pageName];
   const processed = processor(page);
 
@@ -289,15 +289,15 @@ export async function fetchAtlasNotionPages(args: {
  * Processes all Atlas pages using their respective processors
  * Converts raw Notion data into our processed format
  */
-export async function processAtlasNotionPages(
+export function processAtlasNotionPages(
   atlasNotionPages: FetchAtlasNotionPagesResult,
-): Promise<ProcessedAtlasPagesByIdByPageName> {
+): ProcessedAtlasPagesByIdByPageName {
   const atlasPages = {} as ProcessedAtlasPagesByIdByPageName;
 
   for (const key of Object.keys(atlasNotionPages)) {
     const pageName = key as AtlasPageName;
     const pageFromNotionDatabase = atlasNotionPages[pageName];
-    const processedPage = await processNotionPage({
+    const processedPage = processNotionPage({
       page: pageFromNotionDatabase,
       pageName,
     });

@@ -196,6 +196,7 @@ export const SharedSchemaProperties = {
   originalContextData: ProcessedRelations,
   type: DocTypeSchema,
   content: NodeContent,
+  rawContent: z.unknown(),
   files: ProcessedFiles.optional(),
 };
 
