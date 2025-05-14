@@ -70,7 +70,7 @@ async function main() {
   );
 
   // Process the page data
-  const processedPage = await processNotionPage({
+  const processedPage = processNotionPage({
     page: notionPage,
     pageName: pageName as PageName,
   });

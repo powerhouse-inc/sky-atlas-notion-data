@@ -82,7 +82,7 @@ export async function getNotionPage(args: {
  * Processes a Notion page using the appropriate processor
  * Applies the page-specific transformation logic to convert raw Notion data
  */
-function processNotionPage<
+export function processNotionPage<
   T extends ProcessedPagesById = ProcessedPagesById,
 >({
   page,
