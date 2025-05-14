@@ -178,6 +178,65 @@ export async function fetchPageFromNotionDatabase(
   return pages;
 }
 
+export async function fetchDatabaseIdFromNotionDatabase(
+  notion: Client,
+  databaseId: string,
+  noFilter: boolean,
+): Promise<NotionDatabaseQueryResponse[]> {
+  console.log(`Querying from Notion...`);
+  console.log(`Database id: ${databaseId}`);
+  const pages: NotionDatabaseQueryResponse[] = [];
+  let cursor: string | undefined = undefined;
+  let pageCount = 1;
+  const startTime = Date.now();
+
+  while (true) {
+    const queryStartTime = Date.now();
+    const { results, next_cursor } = await notion.databases.query({
+      database_id: databaseId,
+      start_cursor: cursor,
+      filter: noFilter ? undefined : notionDatabaseFilters,
+    });
+    const queryDuration = Date.now() - queryStartTime;
+    console.log(`Fetched page ${pageCount} with ${results.length} results in ${formatDuration(queryDuration)}`);
+    pages.push(...results);
+
+    if (!next_cursor) break;
+
+    cursor = next_cursor;
+    pageCount++;
+  }
+
+  for (const page of pages) {
+    if (!isFullPage(page)) continue;
+    if ("properties" in page) {
+      for (const property of Object.values(page.properties)) {
+        if (
+          property.type === "relation" &&
+          "relation" in property &&
+          "has_more" in property &&
+          property.has_more === true
+        ) {
+          const relationStartTime = Date.now();
+          const fetchedPageProperties = await handlePaginatedRelations(
+            notion,
+            page.id,
+            property.id,
+          );
+          const relationDuration = Date.now() - relationStartTime;
+          console.log(`Fetched relation in ${formatDuration(relationDuration)}`);
+
+          property.relation = fetchedPageProperties;
+        }
+      }
+    }
+  }
+
+  const totalDuration = Date.now() - startTime;
+  console.log(`Fetched ${pages.length} pages from Notion for ${databaseId} in ${formatDuration(totalDuration)}`);
+  return pages;
+}
+
 /**
  * Fetches a page from local cache
  * Used when working offline or with cached data

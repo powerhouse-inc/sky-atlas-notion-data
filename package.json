@@ -21,6 +21,7 @@
     "make-atlas-data-dev": "bun run make-atlas-data --useLocalData --skipImportApi --skipGithubSnapshot",
     "fetch-latest-atlas-data": "bun run ./scripts/fetch-latest-atlas-data.ts",
     "diff-atlas-data": "bun run ./scripts/diff-atlas-data.ts",
+    "fetch-database-id-from-notion": "bun run ./scripts/fetch-database-id-from-notion.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "build": "tsc",
