@@ -10,6 +10,7 @@ import type {
   NotionDataById,
   TProcessedRichText,
 } from "./types/processed-data.js";
+import { capitalizedTagsMap } from "./utils/tags-map.js";
 
 /* Takes all of the notion data and puts it into a map by id.
  * 
@@ -46,7 +47,7 @@ function makeNotionDataForPage(
       rawContent: processed.rawContent as RichTextItemResponse[],
       children: getIds(processed.children),
       files: processed.files ?? [],
-      globalTags: (processed.globalTags ?? []).map((tag) => tag.id),
+      globalTags: (processed.globalTags ?? []).map((tag) => capitalizedTagsMap[tag.id]),
       originalContextData: getIds(processed.originalContextData),
       masterStatus: getMasterStatusName(processed.masterStatus?.[0]?.id),
     };
