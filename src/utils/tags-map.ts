@@ -1,5 +1,8 @@
 import { constantCase } from 'change-case';
 
+/**
+ * Original Notion tags
+ */
 export const tagsMap: Record<string, string> = {
   'c9ec369a-9d75-4ba9-809c-cc5f6124b81e': 'Atlas Editor',
   'f11f1a49-3b02-4033-a968-78bdf7a28acb': 'UX',
@@ -59,10 +62,16 @@ export const tagsMap: Record<string, string> = {
   'c107e848-72a0-436e-8270-b307c5dd358f': 'Scope Advisor',
 };
 
+/**
+ * Capitalized tags. Each tag is converted to constant case.
+ */
 export const capitalizedTagsMap: Record<string, string> = Object.fromEntries(
   Object.entries(tagsMap).map(([key, value]) => [key, constantCase(value)])
 );
 
+/**
+ * Each tag record contains the original tag and its capitalized version.
+ */
 export const tagsRecords = Object.fromEntries(
   Object.entries(tagsMap).map(([key, value]) => [
     key,
