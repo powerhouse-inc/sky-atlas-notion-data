@@ -1,6 +1,6 @@
 import { type RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints.js";
 import {
-  getIds, getMasterStatusName, type NotionDataItemsById,
+  getIds, getMasterStatusName, GLOBAL_TAGS, type NotionDataItemsById,
   ProcessedSection
 } from "./index.js";
 import type {
@@ -8,9 +8,8 @@ import type {
   ProcessedAtlasPagesById,
   ProcessedAtlasPagesByIdByPageName,
   NotionDataById,
-  TProcessedRichText,
+  TProcessedGlobalTagsById,
 } from "./types/processed-data.js";
-import { capitalizedTagsMap } from "./utils/tags-map.js";
 
 /* Takes all of the notion data and puts it into a map by id.
  * 
@@ -21,8 +20,13 @@ export async function makeNotionDataById(
   const notionDataById = {} as NotionDataById;
 
   for (const pageName of Object.keys(processedAtlasPagesByIdByPageName)) {
+    if (pageName === GLOBAL_TAGS) {
+      // we're not creating global tags as a page, but as a property
+      continue;
+    }
     const items = makeNotionDataForPage(
       processedAtlasPagesByIdByPageName[pageName as AtlasPageName],
+      processedAtlasPagesByIdByPageName[GLOBAL_TAGS] as unknown as TProcessedGlobalTagsById,
     );
 
     for (const item of Object.values(items)) {
@@ -35,6 +39,7 @@ export async function makeNotionDataById(
 
 function makeNotionDataForPage(
   processedAtlasPagesById: ProcessedAtlasPagesById,
+  globalTags: TProcessedGlobalTagsById,
 ) {
   const notionDataItemsById: NotionDataItemsById = {};
   for (const processed of Object.values(processedAtlasPagesById)) {
@@ -47,7 +52,7 @@ function makeNotionDataForPage(
       rawContent: processed.rawContent as RichTextItemResponse[],
       children: getIds(processed.children),
       files: processed.files ?? [],
-      globalTags: (processed.globalTags ?? []).map((tag) => capitalizedTagsMap[tag.id]),
+      globalTags: (processed.globalTags ?? []).map((tag) => globalTags[tag.id].nameAsConstant),
       originalContextData: getIds(processed.originalContextData),
       masterStatus: getMasterStatusName(processed.masterStatus?.[0]?.id),
     };
