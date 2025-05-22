@@ -29,6 +29,7 @@ export const ACTIVE_DATA = "activeData";
 export const AGENT = "agent";
 export const AGENT_ARTIFACT = "agentArtifact";
 export const SKY_PRIMITIVE = "skyPrimitive";
+export const GLOBAL_TAGS = "globalTags";
 
 /**
  * Atlas page names
@@ -49,6 +50,7 @@ export const atlasPageNames = [
   ORIGINAL_CONTEXT_DATA,
   ACTIVE_DATA,
   AGENT,
+  GLOBAL_TAGS,
 ] as const;
 
 export const pageIds: Record<PageName, string> = {
@@ -64,6 +66,7 @@ export const pageIds: Record<PageName, string> = {
   [ACTIVE_DATA]: "5b566dd732464927b8eee6e1b2ff99d9",
   [AGENT]: "1bbf2ff08d73808d9ce3e2122857e262",
   [MASTER_STATUS]: "37f256facc7e40dfa045564ebb347b12",
+  [GLOBAL_TAGS]: "b261507c03fc4f6387594dea3d08d692",
 } as const;
 
 export const apiKey = process.env.API_KEY;

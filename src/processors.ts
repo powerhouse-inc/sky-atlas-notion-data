@@ -38,6 +38,7 @@ import {
   agentArtifactsSectionId,
   ANNOTATION,
   ARTICLE,
+  GLOBAL_TAGS,
   MASTER_STATUS,
   NEEDED_RESEARCH,
   ORIGINAL_CONTEXT_DATA,
@@ -537,6 +538,12 @@ function processActiveData(pages: unknown): TProcessedActiveDataById {
   return processed;
 }
 
+function processGlobalTags(pages: unknown) {
+  // TODO: implement processor
+
+  return {};
+}
+
 function getNumberFromNotionNumber(
   notionNumber: TNotionNumber | null | undefined,
 ) {
@@ -573,4 +580,5 @@ export const processors = {
   [NEEDED_RESEARCH]: processNeededResearch,
   [ORIGINAL_CONTEXT_DATA]: processOriginalContextData,
   [ACTIVE_DATA]: processActiveData,
+  [GLOBAL_TAGS]: processGlobalTags,
 } as const;
