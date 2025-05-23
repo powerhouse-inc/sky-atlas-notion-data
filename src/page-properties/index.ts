@@ -10,6 +10,7 @@ import scopesProperties from "./pages/scope.json" with { type: "json" };
 import sectionsProperties from "./pages/section.json" with { type: "json" };
 import agentProperties from "./pages/agent.json" with { type: "json" };
 import tenetsProperties from "./pages/tenet.json" with { type: "json" };
+import globalTagsProperties from "./pages/globalTags.json" with { type: "json" };
 import type { PageName } from "../types/index.js";
 import {
   ACTIVE_DATA,
@@ -24,6 +25,7 @@ import {
   SCOPE,
   SECTION,
   TENET,
+  GLOBAL_TAGS,
 } from "../constants.js";
 
 export const pageProperties: Record<PageName, {
@@ -43,4 +45,5 @@ export const pageProperties: Record<PageName, {
   [SECTION]: sectionsProperties,
   [TENET]: tenetsProperties,
   [AGENT]: agentProperties,
+  [GLOBAL_TAGS]: globalTagsProperties,
 };
