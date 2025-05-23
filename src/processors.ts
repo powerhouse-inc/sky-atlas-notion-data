@@ -38,6 +38,7 @@ import {
   agentArtifactsSectionId,
   ANNOTATION,
   ARTICLE,
+  GLOBAL_TAGS,
   MASTER_STATUS,
   NEEDED_RESEARCH,
   ORIGINAL_CONTEXT_DATA,
@@ -47,9 +48,10 @@ import {
   SECTION,
   TENET,
 } from "./constants.js";
-import { camelCase } from "change-case";
-import { type TNotionUniqueId, type TDocType } from "./types/processed-data.js";
+import { camelCase, constantCase } from "change-case";
+import type { TNotionUniqueId, TDocType, TProcessedGlobalTagsById } from "./types/processed-data.js";
 import { AgentsPageSchema } from "./types/page-schemas/agent.js";
+import { GlobalTagsPageSchema } from "./types/page-schemas/globalTags.js";
 
 function processScopes(pages: unknown): TProcessedScopesById {
   const scopesPages = ScopesPageSchema.parse(pages);
@@ -537,6 +539,27 @@ function processActiveData(pages: unknown): TProcessedActiveDataById {
   return processed;
 }
 
+function processGlobalTags(pages: unknown): TProcessedGlobalTagsById {
+  const globalTagsPages = GlobalTagsPageSchema.parse(pages);  
+  const processed: TProcessedGlobalTagsById = {};
+
+  for (const page of globalTagsPages) {
+    const id = page.id;
+    const properties = page.properties;
+    const name = makeProcessedRichTextString(
+      getTextFromTitle(properties.Name)
+    );
+
+    processed[id] = {
+      id,
+      name,
+      nameAsConstant: constantCase(name),
+    }
+  }
+
+  return processed;
+}
+
 function getNumberFromNotionNumber(
   notionNumber: TNotionNumber | null | undefined,
 ) {
@@ -573,4 +596,5 @@ export const processors = {
   [NEEDED_RESEARCH]: processNeededResearch,
   [ORIGINAL_CONTEXT_DATA]: processOriginalContextData,
   [ACTIVE_DATA]: processActiveData,
+  [GLOBAL_TAGS]: processGlobalTags,
 } as const;

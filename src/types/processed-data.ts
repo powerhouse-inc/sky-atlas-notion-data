@@ -318,6 +318,21 @@ export const ProcessedTenetsById = makeSchemaById(ProcessedTenet);
 export type TProcessedTenetsById = z.infer<typeof ProcessedTenetsById>;
 
 /**
+ * Schema for processed global tags
+ */
+export const ProcessedGlobalTags = z.object({
+  id: z.string(),
+  name: z.string(),
+  nameAsConstant: z.string(),
+});
+
+export const ProcessedGlobalTagsById = makeSchemaById(ProcessedGlobalTags);
+
+export type TProcessedGlobalTagsById = z.infer<typeof ProcessedGlobalTagsById>;
+
+export type TProcessedGlobalTags = z.infer<typeof ProcessedGlobalTags>;
+
+/**
  * Schema for processed needed research
  */
 export const ProcessedNeededResearch = z.object({
