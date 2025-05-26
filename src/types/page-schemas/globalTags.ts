@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { TitleField } from "../notion-data.js";
-import { makePageSchema } from "./utils.js";
+import { makeGlobalTagsSchema } from "./utils.js";
 
 export const GlobalTagsPageProperties = z.object({
   Name: TitleField,
 });
 
-export const GlobalTagsPageSchema = makePageSchema(GlobalTagsPageProperties);
+export const GlobalTagsPageSchema = makeGlobalTagsSchema(GlobalTagsPageProperties);

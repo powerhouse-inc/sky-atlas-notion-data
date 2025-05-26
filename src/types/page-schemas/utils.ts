@@ -19,6 +19,22 @@ export function makePageSchema<TProperties extends z.ZodObject<any>>(
 }
 
 /**
+ * Create a global tags schema by merging common page data with custom properties
+ * 
+ * This function takes a custom properties schema and merges it with the
+ * common page data schema, returning a new schema that includes both.
+ */
+export function makeGlobalTagsSchema<TProperties extends z.ZodObject<any>>(
+  pageProperties: TProperties,
+) {
+  return z.array(
+    CommonPageData.extend({
+      properties: pageProperties,
+    }),
+  );
+}
+
+/**
  * Prettify utility type
  * 
  * This type recursively expands the properties of an object,
