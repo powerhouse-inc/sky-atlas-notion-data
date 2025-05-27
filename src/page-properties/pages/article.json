@@ -33,5 +33,10 @@
     "name": "Sections & Primary Docs",
     "id": "%7BLdm",
     "type": "relation"
+  },
+  {
+    "name": "Global Tags",
+    "id": "~Q%3Cc",
+    "type": "relation"
   }
 ]

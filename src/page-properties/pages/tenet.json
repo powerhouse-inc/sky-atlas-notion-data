@@ -33,5 +33,10 @@
     "name": "Scenarios",
     "id": "%7B%3ALP",
     "type": "relation"
+  },
+  {
+    "name": "Global Tags",
+    "id": "wcR%5E",
+    "type": "relation"
   }
 ]

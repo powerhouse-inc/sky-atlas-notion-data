@@ -103,5 +103,10 @@
     "name": "Parent Article ",
     "id": "xT~n",
     "type": "relation"
+  },
+  {
+    "name": "Global Tags",
+    "id": "T%3A%60N",
+    "type": "relation"
   }
 ]

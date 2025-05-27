@@ -33,5 +33,10 @@
     "name": "Additional Guidance",
     "id": "mHYZ",
     "type": "rich_text"
+  },
+  {
+    "name": "Global Tags",
+    "id": "RH%3Bj",
+    "type": "relation"
   }
 ]

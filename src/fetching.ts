@@ -1,4 +1,4 @@
-import { atlasPageNames, notionDatabaseFilters, pageIds } from "./constants.js";
+import { atlasPageNames, GLOBAL_TAGS, notionDatabaseFilters, pageIds } from "./constants.js";
 import { processors } from "./processors.js";
 import type {
   AtlasPageName,
@@ -277,7 +277,7 @@ export async function fetchAtlasNotionPages(args: {
       outputPath,
       pageName,
       useLocalData,
-      noFilter: false,
+      noFilter: pageName === GLOBAL_TAGS ? true : false,
     });
     atlasNotionPages[pageName] = pageFromNotionDatabase;
   }

@@ -43,5 +43,10 @@
     "name": "Finding",
     "id": "~%5E%7CE",
     "type": "rich_text"
+  },
+  {
+    "name": "Global Tags",
+    "id": "O~pb",
+    "type": "relation"
   }
 ]

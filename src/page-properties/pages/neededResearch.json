@@ -18,5 +18,10 @@
     "name": "Doc No",
     "id": "title",
     "type": "title"
+  },
+  {
+    "name": "Global Tags",
+    "id": "Y%7B%60F",
+    "type": "relation"
   }
 ]

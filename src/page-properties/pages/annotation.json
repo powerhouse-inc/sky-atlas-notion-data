@@ -28,5 +28,10 @@
     "name": "Original Context Data",
     "id": "XDuh",
     "type": "relation"
+  },
+  {
+    "name": "Global Tags",
+    "id": "Vu%3Cw",
+    "type": "relation"
   }
 ]

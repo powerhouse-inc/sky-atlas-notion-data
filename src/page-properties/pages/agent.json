@@ -68,5 +68,10 @@
     "name": "Document Name",
     "id": "title",
     "type": "title"
+  },
+  {
+    "name": "Global Tags",
+    "id": "v%3FdI",
+    "type": "relation"
   }
 ]

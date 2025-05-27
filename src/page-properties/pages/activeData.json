@@ -28,5 +28,10 @@
     "name": "Original Context Data",
     "id": "%7B%5Epn",
     "type": "relation"
+  },
+  {
+    "name": "Global Tags",
+    "id": "zQX%60",
+    "type": "relation"
   }
 ]

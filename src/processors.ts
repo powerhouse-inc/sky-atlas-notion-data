@@ -540,7 +540,7 @@ function processActiveData(pages: unknown): TProcessedActiveDataById {
 }
 
 function processGlobalTags(pages: unknown): TProcessedGlobalTagsById {
-  const globalTagsPages = GlobalTagsPageSchema.parse(pages);  
+  const globalTagsPages = GlobalTagsPageSchema.parse(pages);
   const processed: TProcessedGlobalTagsById = {};
 
   for (const page of globalTagsPages) {

@@ -33,5 +33,10 @@
     "name": "Needed Research",
     "id": "nZfF",
     "type": "relation"
+  },
+  {
+    "name": "Global Tags",
+    "id": "f%3AP%7C",
+    "type": "relation"
   }
 ]
