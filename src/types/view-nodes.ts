@@ -161,9 +161,11 @@ export type MentionViewNodeContent = {
 
 /**
  * Content type for equations in processed view nodes
+ * Supports both inline and block equations for KaTeX rendering
  */
 export type EquationViewNodeContent = {
   type: "equation";
+  variant: "inline" | "block";
   text: string;
 };
 
