@@ -273,7 +273,7 @@ function processContentForViewNode(
   rawViewNodeMap: RawViewNodeMap,
   slugLookup: Record<string, string>
 ): TProcessedNodeContentItem[] {
-  return node.content
+  const initialProcessedItems = node.content
     .map((contentItem) => {
       // Process the 'heading' field (preserve as is)
       const heading = contentItem.heading;
@@ -283,10 +283,8 @@ function processContentForViewNode(
       // Process the 'text' field
       if (typeof contentItem.text === 'string') {
         if (contentItem.text.length > 0) {
-          processedText.push({
-            type: 'paragraphs',
-            text: contentItem.text,
-          });
+          // Use LaTeX detection for string content
+          processedText.push(...makeContentFromText(contentItem.text));
         }
       } else if (Array.isArray(contentItem.text)) {
         processedText = contentItem.text
@@ -305,6 +303,71 @@ function processContentForViewNode(
       }
     })
     .filter((item) => item !== null && item !== undefined);
+
+  // Post-process to handle LaTeX expressions that span multiple content items
+  return processLatexAcrossContentItems(initialProcessedItems);
+}
+
+/**
+ * Processes LaTeX expressions that may span across multiple content items
+ * This handles cases where block equations ($$...$$) are split across multiple paragraph items
+ * 
+ * @param {TProcessedNodeContentItem[]} contentItems - Initial processed content items
+ * @returns {TProcessedNodeContentItem[]} Content items with LaTeX properly detected and merged
+ */
+function processLatexAcrossContentItems(
+  contentItems: TProcessedNodeContentItem[]
+): TProcessedNodeContentItem[] {
+  const result: TProcessedNodeContentItem[] = [];
+
+  for (const contentItem of contentItems) {
+    // Only process content items that contain paragraph text
+    const hasParagraphs = contentItem.text.some(item => item.type === 'paragraphs');
+    
+    if (!hasParagraphs) {
+      // No paragraphs to process, keep as-is
+      result.push(contentItem);
+      continue;
+    }
+
+    // Collect all paragraph text to check for cross-item LaTeX patterns
+    const combinedText = contentItem.text
+      .filter(item => item.type === 'paragraphs')
+      .map(item => item.text)
+      .join('');
+
+    if (!combinedText.includes('$')) {
+      // No LaTeX patterns, keep as-is
+      result.push(contentItem);
+      continue;
+    }
+
+    // Process the combined text for LaTeX patterns
+    const processedContent = makeContentFromText(combinedText);
+    
+    // Preserve non-paragraph items (links, mentions, etc.) and replace paragraphs with processed content
+    const newTextItems: TProcessedViewNodeContent[] = [];
+    
+    for (const item of contentItem.text) {
+      if (item.type === 'paragraphs') {
+        // Skip the original paragraph items - they're replaced by processedContent
+        continue;
+      } else {
+        // Keep non-paragraph items as-is
+        newTextItems.push(item);
+      }
+    }
+    
+    // Add all processed content (which includes proper LaTeX detection)
+    newTextItems.push(...processedContent);
+
+    result.push({
+      heading: contentItem.heading,
+      text: newTextItems,
+    });
+  }
+
+  return result;
 }
 
 /**
@@ -361,7 +424,7 @@ function makeProcessedContentItem(
   }
 
   if (richTextItem.type === 'equation' && richTextItem.plain_text?.length) {
-    return makeEquationContent(richTextItem.plain_text);
+    return makeEquationContent(richTextItem.plain_text, "block");
   }
 
   if (richTextItem.annotations?.code && richTextItem.plain_text?.length) {
@@ -430,6 +493,88 @@ async function processMarkdownContentForViewNode(
 }
 
 /**
+ * Detects and processes LaTeX mathematical expressions in text
+ * 
+ * Recognizes patterns:
+ * - Block equations: $$...$$
+ * - Inline equations: $...$
+ * 
+ * @param {string} text - Text that may contain LaTeX expressions
+ * @returns {TProcessedViewNodeContent[]} Array of processed content items (paragraphs and equations)
+ */
+function detectAndProcessLatexInText(text: string): TProcessedViewNodeContent[] {
+  if (!text) {
+    return [];
+  }
+
+  const result: TProcessedViewNodeContent[] = [];
+  let position = 0;
+
+  while (position < text.length) {
+    // Look for block equations first ($$...$$)
+    const blockMatch = text.slice(position).match(/\$\$([\s\S]*?)\$\$/);
+    
+    // Look for inline equations ($...$) but exclude escaped ones (\$) and block delimiters
+    const inlineMatch = text.slice(position).match(/(?<!\\)\$(?!\$)((?:[^$\\]|\\.)*)(?<!\\)\$(?!\$)/);
+    
+    let nextMatch: { type: 'block' | 'inline'; match: RegExpMatchArray; content: string } | null = null;
+    
+    // Determine which match comes first
+    if (blockMatch && inlineMatch) {
+      if (blockMatch.index! < inlineMatch.index!) {
+        nextMatch = { type: 'block', match: blockMatch, content: blockMatch[1].trim() };
+      } else {
+        nextMatch = { type: 'inline', match: inlineMatch, content: inlineMatch[1].trim() };
+      }
+    } else if (blockMatch) {
+      nextMatch = { type: 'block', match: blockMatch, content: blockMatch[1].trim() };
+    } else if (inlineMatch) {
+      nextMatch = { type: 'inline', match: inlineMatch, content: inlineMatch[1].trim() };
+    }
+
+    if (!nextMatch) {
+      // No more LaTeX expressions, add remaining text as paragraph
+      const remainingText = text.slice(position).trim();
+      if (remainingText) {
+        result.push(makeParagraphsContent(remainingText));
+      }
+      break;
+    }
+
+    // Add text before the LaTeX expression as paragraph
+    const beforeText = text.slice(position, position + nextMatch.match.index!).trim();
+    if (beforeText) {
+      result.push(makeParagraphsContent(beforeText));
+    }
+
+    // Add the LaTeX expression as equation
+    if (nextMatch.content) {
+      result.push(makeEquationContent(nextMatch.content, nextMatch.type));
+    }
+
+    // Move position past the current match
+    position += nextMatch.match.index! + nextMatch.match[0].length;
+  }
+
+  return result.filter(item => item.text.trim().length > 0);
+}
+
+/**
+ * Creates content items from text, detecting and processing LaTeX expressions
+ * @param {string} text - Text content that may contain LaTeX
+ * @returns {TProcessedViewNodeContent[]} Array of processed content items
+ */
+function makeContentFromText(text: string): TProcessedViewNodeContent[] {
+  // Check if text contains LaTeX expressions
+  if (text.includes('$')) {
+    return detectAndProcessLatexInText(text);
+  }
+  
+  // No LaTeX found, return as regular paragraph
+  return [makeParagraphsContent(text)];
+}
+
+/**
  * Creates a paragraphs content item
  * @param {string} text - Text content
  * @returns {TProcessedViewNodeContent} Paragraphs content item
@@ -467,12 +612,14 @@ function makeTableContent(text: string) {
 
 /**
  * Creates an equation content item
- * @param {string} text - Equation content
+ * @param {string} text - Equation content (without LaTeX delimiters)
+ * @param {"inline" | "block"} variant - Equation type for KaTeX rendering
  * @returns {TProcessedViewNodeContent} Equation content item
  */
-function makeEquationContent(text: string) {
+function makeEquationContent(text: string, variant: "inline" | "block" = "inline") {
   return {
     type: 'equation',
+    variant,
     text,
   } as const;
 }
