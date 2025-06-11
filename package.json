@@ -14,7 +14,8 @@
   "bin": {
     "make-atlas-data": "./dist/scripts/make-atlas-data.js",
     "fetch-latest-atlas-data": "./dist/scripts/fetch-latest-atlas-data.js",
-    "diff-atlas-data": "./dist/scripts/diff-atlas-data.js"
+    "diff-atlas-data": "./dist/scripts/diff-atlas-data.js",
+    "upload-data": "./dist/scripts/upload-data-to-vercel.js"
   },
   "scripts": {
     "make-atlas-data": "bun run ./scripts/make-atlas-data.ts",
