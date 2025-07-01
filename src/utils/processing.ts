@@ -515,7 +515,7 @@ function detectAndProcessLatexInText(text: string): TProcessedViewNodeContent[] 
     const blockMatch = text.slice(position).match(/\$\$([\s\S]*?)\$\$/);
     
     // Look for inline equations ($...$) but exclude escaped ones (\$) and block delimiters
-    const inlineMatch = text.slice(position).match(/(?<!\\)\$(?!\$)((?:[^$\\]|\\.)*)(?<!\\)\$(?!\$)/);
+    const inlineMatch = text.slice(position).match(/(?<!\\)(?<=^|[^\w$])\$(?!\$)(?![\d\s])((?:[^$\\]|\\.)*?)(?<!\\)\$(?!\$)(?=$|[^\w$])/);
     
     let nextMatch: { type: 'block' | 'inline'; match: RegExpMatchArray; content: string } | null = null;
     
