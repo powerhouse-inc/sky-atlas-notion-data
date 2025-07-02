@@ -14,8 +14,7 @@
   "bin": {
     "make-atlas-data": "./dist/scripts/make-atlas-data.js",
     "fetch-latest-atlas-data": "./dist/scripts/fetch-latest-atlas-data.js",
-    "diff-atlas-data": "./dist/scripts/diff-atlas-data.js",
-    "upload-data": "./dist/scripts/upload-data-to-vercel.js"
+    "diff-atlas-data": "./dist/scripts/diff-atlas-data.js"
   },
   "scripts": {
     "make-atlas-data": "bun run ./scripts/make-atlas-data.ts",
@@ -23,7 +22,6 @@
     "fetch-latest-atlas-data": "bun run ./scripts/fetch-latest-atlas-data.ts",
     "diff-atlas-data": "bun run ./scripts/diff-atlas-data.ts",
     "fetch-database-id-from-notion": "bun run ./scripts/fetch-database-id-from-notion.ts",
-    "upload-data": "bun run ./scripts/upload-data-to-vercel.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "build": "tsc",
@@ -42,9 +40,7 @@
     "@types/diff": "^7.0.2",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.2",
-    "@vercel/blob": "^1.1.1",
     "change-case": "^5.4.4",
-    "date-fns": "^4.1.0",
     "diff": "^7.0.0",
     "dotenv": "^16.4.7",
     "dotenv-expand": "^12.0.1",
