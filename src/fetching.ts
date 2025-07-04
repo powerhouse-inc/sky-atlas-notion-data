@@ -324,6 +324,7 @@ export async function handlePaginatedRelations(
       page_id: pageId,
       property_id: propertyId,
       start_cursor: cursor,
+      page_size: 25,
     });
 
     if (response.type === "property_item") {
