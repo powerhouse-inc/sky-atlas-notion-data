@@ -323,47 +323,42 @@ function processLatexAcrossContentItems(
   for (const contentItem of contentItems) {
     // Only process content items that contain paragraph text
     const hasParagraphs = contentItem.text.some(item => item.type === 'paragraphs');
-    
     if (!hasParagraphs) {
       // No paragraphs to process, keep as-is
       result.push(contentItem);
       continue;
     }
 
-    // Collect all paragraph text to check for cross-item LaTeX patterns
-    const combinedText = contentItem.text
-      .filter(item => item.type === 'paragraphs')
-      .map(item => item.text)
-      .join('');
+    // Only merge adjacent paragraph items; keep others in place.
+    const rebuiltText: TProcessedViewNodeContent[] = [];
+    let pendingParagraphs: string[] = [];
 
-    if (!combinedText.includes('$')) {
-      // No LaTeX patterns, keep as-is
-      result.push(contentItem);
-      continue;
-    }
+    const flushPendingParagraphs = () => {
+      if (pendingParagraphs.length === 0) return;
+      const combined = pendingParagraphs.join('');
+      const processed = combined.includes('$')
+        ? makeContentFromText(combined)
+        : [makeParagraphsContent(combined)];
+      rebuiltText.push(...processed);
+      pendingParagraphs = [];
+    };
 
-    // Process the combined text for LaTeX patterns
-    const processedContent = makeContentFromText(combinedText);
-    
-    // Preserve non-paragraph items (links, mentions, etc.) and replace paragraphs with processed content
-    const newTextItems: TProcessedViewNodeContent[] = [];
-    
     for (const item of contentItem.text) {
       if (item.type === 'paragraphs') {
-        // Skip the original paragraph items - they're replaced by processedContent
-        continue;
+        pendingParagraphs.push(item.text);
       } else {
-        // Keep non-paragraph items as-is
-        newTextItems.push(item);
+        // Before pushing a non-paragraph item, flush any accumulated paragraphs
+        flushPendingParagraphs();
+        rebuiltText.push(item);
       }
     }
-    
-    // Add all processed content (which includes proper LaTeX detection)
-    newTextItems.push(...processedContent);
+
+    // Flush any remaining paragraphs at the end
+    flushPendingParagraphs();
 
     result.push({
       heading: contentItem.heading,
-      text: newTextItems,
+      text: rebuiltText,
     });
   }
 
