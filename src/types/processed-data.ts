@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 import {
   ACTIVE_DATA,
   ACTIVE_DATA_CONTROLLER,
@@ -17,10 +17,10 @@ import {
   TYPE_SPECIFICATION,
   type allowedPageFieldTypes,
   type atlasPageNames,
-} from "../constants.js";
-import { makeSchemaById } from "../utils/processing.js";
-import { RichTextAnnotations } from "./notion-data.js";
-import type { NotionDataItem } from "./view-nodes.js";
+} from '../constants.js';
+import { makeSchemaById } from '../utils/processing.js';
+import { RichTextAnnotations } from './notion-data.js';
+import type { NotionDataItem } from './view-nodes.js';
 
 /**
  * Schema for Notion's unique ID fields, which combine a prefix and number
@@ -45,14 +45,12 @@ export type TNotionNumber = z.infer<typeof NotionNumber>;
 
 /**
  * Schema for processed rich text content
- * 
+ *
  * This takes our parsed RichText type and normalizes it into a more general format.
  */
 export const ProcessedRichText = z.array(
   z.object({
-    type: z
-      .union([z.literal("text"), z.literal("equation"), z.literal("mention")])
-      .nullish(),
+    type: z.union([z.literal('text'), z.literal('equation'), z.literal('mention')]).nullish(),
     text: z
       .object({
         link: z
@@ -77,7 +75,12 @@ export const ProcessedRichText = z.array(
       })
       .nullable()
       .optional(),
-  }),
+    equation: z
+      .object({
+        expression: z.string(),
+      })
+      .nullish(),
+  })
 );
 
 export type TProcessedRichText = z.infer<typeof ProcessedRichText>;
@@ -91,7 +94,7 @@ export const NodeContent = z.array(
   z.object({
     heading: z.string().nullish(),
     text: ProcessedRichText.or(z.string()).nullish(),
-  }),
+  })
 );
 
 export type TNodeContent = z.infer<typeof NodeContent>;
@@ -125,9 +128,9 @@ export const CommonRelations = {
 
 /**
  * Schema for section document types
- * 
- * Section doc types are special because they can be have recursive parent-child relationships. 
- * 
+ *
+ * Section doc types are special because they can be have recursive parent-child relationships.
+ *
  * These are subject to special processing because their parent-child relationships are not always persisted both ways in Notion.
  * Categories also have special logic, see `makeNotionDataById` for details.
  */
@@ -182,7 +185,7 @@ export type TDocType = z.infer<typeof DocTypeSchema>;
 
 /**
  * Common properties shared across all processed documents
- * 
+ *
  * We create string representations of the name and docNo fields to make them easier to work with.
  */
 export const SharedSchemaProperties = {
@@ -207,17 +210,11 @@ export const ProcessedScenarioVariation = z.object({
   ...SharedSchemaProperties,
 });
 
-export type TProcessedScenarioVariation = z.infer<
-  typeof ProcessedScenarioVariation
->;
+export type TProcessedScenarioVariation = z.infer<typeof ProcessedScenarioVariation>;
 
-export const ProcessedScenarioVariationsById = makeSchemaById(
-  ProcessedScenarioVariation,
-);
+export const ProcessedScenarioVariationsById = makeSchemaById(ProcessedScenarioVariation);
 
-export type TProcessedScenarioVariationsById = z.infer<
-  typeof ProcessedScenarioVariationsById
->;
+export type TProcessedScenarioVariationsById = z.infer<typeof ProcessedScenarioVariationsById>;
 
 /**
  * Schema for processed scenarios
@@ -287,9 +284,7 @@ export type TProcessedAnnotation = z.infer<typeof ProcessedAnnotation>;
 
 export const ProcessedAnnotationsById = makeSchemaById(ProcessedAnnotation);
 
-export type TProcessedAnnotationsById = z.infer<
-  typeof ProcessedAnnotationsById
->;
+export type TProcessedAnnotationsById = z.infer<typeof ProcessedAnnotationsById>;
 
 /**
  * Schema for processed tenets
@@ -341,13 +336,9 @@ export const ProcessedNeededResearch = z.object({
 
 export type TProcessedNeededResearch = z.infer<typeof ProcessedNeededResearch>;
 
-export const ProcessedNeededResearchById = makeSchemaById(
-  ProcessedNeededResearch,
-);
+export const ProcessedNeededResearchById = makeSchemaById(ProcessedNeededResearch);
 
-export type TProcessedNeededResearchById = z.infer<
-  typeof ProcessedNeededResearchById
->;
+export type TProcessedNeededResearchById = z.infer<typeof ProcessedNeededResearchById>;
 
 /**
  * Schema for processed original context data
@@ -356,21 +347,15 @@ export const ProcessedOriginalContextData = z.object({
   ...SharedSchemaProperties,
 });
 
-export type TProcessedOriginalContextData = z.infer<
-  typeof ProcessedOriginalContextData
->;
+export type TProcessedOriginalContextData = z.infer<typeof ProcessedOriginalContextData>;
 
-export const ProcessedOriginalContextDataById = makeSchemaById(
-  ProcessedOriginalContextData,
-);
+export const ProcessedOriginalContextDataById = makeSchemaById(ProcessedOriginalContextData);
 
-export type TProcessedOriginalContextDataById = z.infer<
-  typeof ProcessedOriginalContextDataById
->;
+export type TProcessedOriginalContextDataById = z.infer<typeof ProcessedOriginalContextDataById>;
 
 /**
  * Schema for processed master status
- * 
+ *
  * The master status is not shown in the Atlas Explorer, but it is used to determine which items in Notion should be fetched and shown.
  */
 export const ProcessedMasterStatus = z.object({
@@ -383,9 +368,7 @@ export type TProcessedMasterStatus = z.infer<typeof ProcessedMasterStatus>;
 
 export const ProcessedMasterStatusById = makeSchemaById(ProcessedMasterStatus);
 
-export type TProcessedMasterStatusById = z.infer<
-  typeof ProcessedMasterStatusById
->;
+export type TProcessedMasterStatusById = z.infer<typeof ProcessedMasterStatusById>;
 
 /**
  * Type for Atlas page names
@@ -411,9 +394,9 @@ export type PagePropertiesList = {
 
 /**
  * Union type for all Atlas page types
- * 
+ *
  * This is the main type that we use to represent the data in the Atlas Explorer.
- * 
+ *
  * Excluding the reference pages, this is the type that is used to represent the data in the Atlas Explorer.
  */
 export type ProcessedAtlasPage =
@@ -448,14 +431,9 @@ export type ProcessedPagesById = ProcessedAtlasPagesById | TProcessedMasterStatu
 /**
  * Type for Atlas page maps by page name
  */
-export type ProcessedAtlasPagesByIdByPageName = Record<
-  AtlasPageName,
-  ProcessedAtlasPagesById
->;
+export type ProcessedAtlasPagesByIdByPageName = Record<AtlasPageName, ProcessedAtlasPagesById>;
 
 /**
  * Type for Notion data by ID
  */
 export type NotionDataById = Record<string, NotionDataItem>;
-
-
