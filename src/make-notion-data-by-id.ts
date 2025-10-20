@@ -1,7 +1,7 @@
 import { type RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints.js";
 import {
   getIds, getMasterStatusName, GLOBAL_TAGS, type NotionDataItemsById,
-  ProcessedSection
+  ProcessedSection, isAllowedMasterStatus, collectAllDescendants
 } from "./index.js";
 import type {
   AtlasPageName,
@@ -19,6 +19,7 @@ export async function makeNotionDataById(
   processedAtlasPagesByIdByPageName: ProcessedAtlasPagesByIdByPageName) {
   const notionDataById = {} as NotionDataById;
 
+  // First pass: Build the complete map
   for (const pageName of Object.keys(processedAtlasPagesByIdByPageName)) {
     if (pageName === GLOBAL_TAGS) {
       // we're not creating global tags as a page, but as a property
@@ -32,6 +33,22 @@ export async function makeNotionDataById(
     for (const item of Object.values(items)) {
       notionDataById[item.id] = item;
     }
+  }
+
+  // Second pass: Apply cascading filter
+  const idsToRemove = new Set<string>();
+  
+  // Identify all documents with non-allowed master status
+  for (const item of Object.values(notionDataById)) {
+    if (!isAllowedMasterStatus(item.masterStatus)) {
+      // Collect this document and all its descendants
+      collectAllDescendants(item.id, notionDataById, idsToRemove);
+    }
+  }
+  
+  // Remove all filtered documents and their descendants
+  for (const id of idsToRemove) {
+    delete notionDataById[id];
   }
 
   return notionDataById;

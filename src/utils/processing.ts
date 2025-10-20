@@ -25,7 +25,13 @@ import {
   type TRichTextField,
   type TSelect,
 } from '../types/index.js';
-import { agentArtifactsSectionId, masterStatusesIdMap } from '../constants.js';
+import {
+  agentArtifactsSectionId,
+  masterStatusesIdMap,
+  APPROVED,
+  PROVISIONAL,
+  PLACEHOLDER,
+} from '../constants.js';
 import { makeAtlasDataHtmlDocument } from '../components/make-atlas-data-html-string.js';
 import { convertToMarkdown } from './markdown-converter.js';
 import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints.js';
@@ -38,7 +44,9 @@ import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoi
 export function getTextFromTitle(titleField: TTitleField): TProcessedRichText {
   const title = titleField?.title ?? [];
 
-  return title.filter((item) => item !== null && item !== undefined);
+  return title.filter(
+    (item): item is NonNullable<typeof item> => item !== null && item !== undefined
+  );
 }
 
 /**
@@ -48,7 +56,9 @@ export function getTextFromTitle(titleField: TTitleField): TProcessedRichText {
  */
 export function getContentFromRichText(richTextField: TRichTextField): TProcessedRichText {
   const richText = richTextField?.rich_text ?? [];
-  return richText.filter((item) => item !== null && item !== undefined);
+  return richText.filter(
+    (item): item is NonNullable<typeof item> => item !== null && item !== undefined
+  );
 }
 
 /**
@@ -89,7 +99,7 @@ export function getProcessedFiles(files: TFiles): TProcessedFile[] {
 
       return null;
     })
-    .filter((file) => file !== null && file !== undefined);
+    .filter((file): file is TProcessedFile => file !== null && file !== undefined);
 }
 
 /**
@@ -150,6 +160,46 @@ export function getMasterStatusName(masterStatusId?: string): string | null {
   if (!masterStatusId) return null;
 
   return masterStatusesIdMap[masterStatusId] ?? null;
+}
+
+/**
+ * Checks if a master status is allowed in the generated JSON files
+ * Only "Approved", "Provisional", and "Placeholder" statuses are allowed
+ * @param {string | null} masterStatus - The master status to check
+ * @returns {boolean} True if the status is allowed, false otherwise
+ */
+export function isAllowedMasterStatus(masterStatus: string | null): boolean {
+  if (!masterStatus) return false;
+
+  return [APPROVED, PROVISIONAL, PLACEHOLDER].includes(masterStatus);
+}
+
+/**
+ * Recursively collects all descendant IDs for a given document
+ * @param {string} documentId - The parent document ID
+ * @param {Record<string, {children: string[]}>} notionDataById - Map of all documents
+ * @param {Set<string>} collected - Set to accumulate descendant IDs (prevents infinite loops)
+ * @returns {Set<string>} Set of all descendant IDs
+ */
+export function collectAllDescendants(
+  documentId: string,
+  notionDataById: Record<string, { children: string[] }>,
+  collected: Set<string> = new Set()
+): Set<string> {
+  if (collected.has(documentId)) {
+    return collected; // Prevent infinite loops from circular references
+  }
+
+  collected.add(documentId);
+  const document = notionDataById[documentId];
+
+  if (document && document.children) {
+    for (const childId of document.children) {
+      collectAllDescendants(childId, notionDataById, collected);
+    }
+  }
+
+  return collected;
 }
 
 /**
@@ -235,7 +285,7 @@ async function processRawViewNode(
   }
 
   // Create the ViewNode, omitting specified properties and adding processed ones
-  const { content: _, subDocuments: __, ...rest } = node;
+  const { content: _, subDocuments: __, rawContent: ___, ...rest } = node;
   const viewNode: ViewNodeExtended = {
     ...rest,
     content,
@@ -302,7 +352,7 @@ function processContentForViewNode(
         return null;
       }
     })
-    .filter((item) => item !== null && item !== undefined);
+    .filter((item): item is NonNullable<typeof item> => item !== null && item !== undefined);
 
   // Post-process to handle LaTeX expressions that span multiple content items
   return processLatexAcrossContentItems(initialProcessedItems);
@@ -311,7 +361,7 @@ function processContentForViewNode(
 /**
  * Processes LaTeX expressions that may span across multiple content items
  * This handles cases where block equations ($$...$$) are split across multiple paragraph items
- * 
+ *
  * @param {TProcessedNodeContentItem[]} contentItems - Initial processed content items
  * @returns {TProcessedNodeContentItem[]} Content items with LaTeX properly detected and merged
  */
@@ -322,7 +372,7 @@ function processLatexAcrossContentItems(
 
   for (const contentItem of contentItems) {
     // Only process content items that contain paragraph text
-    const hasParagraphs = contentItem.text.some(item => item.type === 'paragraphs');
+    const hasParagraphs = contentItem.text.some((item) => item.type === 'paragraphs');
     if (!hasParagraphs) {
       // No paragraphs to process, keep as-is
       result.push(contentItem);
@@ -419,7 +469,7 @@ function makeProcessedContentItem(
   }
 
   if (richTextItem.type === 'equation' && richTextItem.plain_text?.length) {
-    return makeEquationContent(richTextItem.plain_text, "block");
+    return makeEquationContent(richTextItem.plain_text, 'block');
   }
 
   if (richTextItem.annotations?.code && richTextItem.plain_text?.length) {
@@ -453,7 +503,7 @@ async function processMarkdownContentForViewNode(
     return '';
   }
 
-  const processedRichText = (richText).map((item: RichTextItemResponse) => {
+  const processedRichText = richText.map((item: RichTextItemResponse) => {
     if (item.type === 'mention') {
       let node;
 
@@ -467,7 +517,7 @@ async function processMarkdownContentForViewNode(
         const text = `[${makeViewNodeTitleText(node)}](${makeViewNodeUrl(node)})`;
 
         return {
-          type: "text" as const,
+          type: 'text' as const,
           text: {
             content: text,
             link: null,
@@ -489,11 +539,11 @@ async function processMarkdownContentForViewNode(
 
 /**
  * Detects and processes LaTeX mathematical expressions in text
- * 
+ *
  * Recognizes patterns:
  * - Block equations: $$...$$
  * - Inline equations: $...$
- * 
+ *
  * @param {string} text - Text that may contain LaTeX expressions
  * @returns {TProcessedViewNodeContent[]} Array of processed content items (paragraphs and equations)
  */
@@ -508,12 +558,15 @@ function detectAndProcessLatexInText(text: string): TProcessedViewNodeContent[] 
   while (position < text.length) {
     // Look for block equations first ($$...$$)
     const blockMatch = text.slice(position).match(/\$\$([\s\S]*?)\$\$/);
-    
+
     // Look for inline equations ($...$) but exclude escaped ones (\$) and block delimiters
-    const inlineMatch = text.slice(position).match(/(?<!\\)(?<=^|[^\w$])\$(?!\$)(?![\d\s])((?:[^$\\]|\\.)*?)(?<!\\)\$(?!\$)(?=$|[^\w$])/);
-    
-    let nextMatch: { type: 'block' | 'inline'; match: RegExpMatchArray; content: string } | null = null;
-    
+    const inlineMatch = text
+      .slice(position)
+      .match(/(?<!\\)(?<=^|[^\w$])\$(?!\$)(?![\d\s])((?:[^$\\]|\\.)*?)(?<!\\)\$(?!\$)(?=$|[^\w$])/);
+
+    let nextMatch: { type: 'block' | 'inline'; match: RegExpMatchArray; content: string } | null =
+      null;
+
     // Determine which match comes first
     if (blockMatch && inlineMatch) {
       if (blockMatch.index! < inlineMatch.index!) {
@@ -551,7 +604,7 @@ function detectAndProcessLatexInText(text: string): TProcessedViewNodeContent[] 
     position += nextMatch.match.index! + nextMatch.match[0].length;
   }
 
-  return result.filter(item => item.text.trim().length > 0);
+  return result.filter((item) => item.text.trim().length > 0);
 }
 
 /**
@@ -564,7 +617,7 @@ function makeContentFromText(text: string): TProcessedViewNodeContent[] {
   if (text.includes('$')) {
     return detectAndProcessLatexInText(text);
   }
-  
+
   // No LaTeX found, return as regular paragraph
   return [makeParagraphsContent(text)];
 }
@@ -611,7 +664,7 @@ function makeTableContent(text: string) {
  * @param {"inline" | "block"} variant - Equation type for KaTeX rendering
  * @returns {TProcessedViewNodeContent} Equation content item
  */
-function makeEquationContent(text: string, variant: "inline" | "block" = "inline") {
+function makeEquationContent(text: string, variant: 'inline' | 'block' = 'inline') {
   return {
     type: 'equation',
     variant,
